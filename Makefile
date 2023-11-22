@@ -5,7 +5,6 @@ SRCDIR	:= src
 TESTDIR := tests
 LIBDIR	:= lib
 INCDIR	:= include
-APIDIR  := plug-standard/src/
 
 BUILDDIR:= build
 OBJDIR 	:= $(BUILDDIR)/obj
@@ -37,6 +36,9 @@ CDEBUG:=-D _DEBUG -ggdb3 -fcheck-new -fsized-deallocation -fstack-protector\
 CMACHINE:=-mavx512f -march=native -mtune=native
 
 CFLAGS:=-std=c++17 -fPIE $(CMACHINE) $(CWARN)
+INCFLAGS:= -I$(SRCDIR) -I$(INCDIR)
+LFLAGS  := -Llib/ $(addprefix -l, $(LIBS))\
+			-lsfml-graphics -lsfml-window -lsfml-system
 
 ifeq ($(BUILDTYPE), Release)
 	CFLAGS:=-O3 $(CFLAGS)
@@ -52,24 +54,12 @@ TIDYCHECKS:=-*,clang-analyzer-*,cert-*,-bugprone-*,-cppcoreguidelines-*
 TIDYFLAGS :=--checks=$(TIDYCHECKS) --quiet --warnings-as-errors=*
 TIDYFLAGS +=$(foreach flag, $(CFLAGS),--extra-arg=$(flag))
 
-HEADERS := $(shell find $(SRCDIR) -type f -name "*.$(HEADEXT)")
-SOURCES := $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
+HEADERS := $(shell find -L $(SRCDIR) -type f -name "*.$(HEADEXT)")
+SOURCES := $(shell find -L $(SRCDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS	:= $(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
-
-CHECKDIR :=$(BUILDDIR)/check
-CHECKMAIN:=$(CHECKDIR)/main.cpp
-CHECKFILE:=$(CHECKDIR)/check.cpp
-CHECKINC :=$(patsubst $(SRCDIR)/%,%,$(HEADERS))
-
-SOURCES := $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
 TESTS	:= $(shell find $(TESTDIR) -type f -name "*$(SRCEXT)")
-LIBS	:= $(patsubst lib%.a, %, $(shell find $(LIBDIR) -type f))
-OBJECTS	:= $(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
 TESTOBJS:= $(patsubst %,$(OBJDIR)/%,$(TESTS:.$(SRCEXT)=.$(OBJEXT)))
-
-INCFLAGS:= -I$(SRCDIR) -I$(INCDIR) -I$(APIDIR)
-LFLAGS  := -Llib/ $(addprefix -l, $(LIBS))\
-			-lsfml-graphics -lsfml-window -lsfml-system
+LIBS	:= $(patsubst lib%.a, %, $(shell find $(LIBDIR) -type f))
 
 all: $(BINDIR)/$(PROJECT)
 
@@ -99,9 +89,11 @@ $(OBJDIR)/$(TESTDIR)/%.$(OBJEXT): $(TESTDIR)/%.$(SRCEXT)
 
 # Build source objects
 $(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
+	@echo -n Building $@ "... "
 	@$(CTIDY) $(TIDYFLAGS) $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INCFLAGS) -c $< -o $@
+	@echo done!
 
 # Build project binary
 $(BINDIR)/$(PROJECT): $(OBJECTS)
