@@ -5,6 +5,7 @@ SRCDIR	:= src
 TESTDIR := tests
 LIBDIR	:= lib
 INCDIR	:= include
+APIDIR  := plug-standard/src/
 
 BUILDDIR:= build
 OBJDIR 	:= $(BUILDDIR)/obj
@@ -66,7 +67,7 @@ LIBS	:= $(patsubst lib%.a, %, $(shell find $(LIBDIR) -type f))
 OBJECTS	:= $(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
 TESTOBJS:= $(patsubst %,$(OBJDIR)/%,$(TESTS:.$(SRCEXT)=.$(OBJEXT)))
 
-INCFLAGS:= -I$(SRCDIR) -I$(INCDIR)
+INCFLAGS:= -I$(SRCDIR) -I$(INCDIR) -I$(APIDIR)
 LFLAGS  := -Llib/ $(addprefix -l, $(LIBS))\
 			-lsfml-graphics -lsfml-window -lsfml-system
 

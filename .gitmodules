@@ -1,0 +1,4 @@
+[submodule "plug-standard"]
+	path = plug-standard
+	url = https://github.com/B05-232/plug-standard.git
+	branch = v1-draft
