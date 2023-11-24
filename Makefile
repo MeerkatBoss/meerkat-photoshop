@@ -51,7 +51,9 @@ FMTFLAGS :=--dry-run -Werror -ferror-limit=1
 
 CTIDY     :=clang-tidy
 TIDYCHECKS:=-*,clang-analyzer-*,cert-*,-bugprone-*,-cppcoreguidelines-*
-TIDYFLAGS :=--checks=$(TIDYCHECKS) --quiet --warnings-as-errors=*
+TIDYFLAGS :=--checks=$(TIDYCHECKS) --header-filter="" --quiet\
+--warnings-as-errors=*
+
 TIDYFLAGS +=$(foreach flag, $(CFLAGS),--extra-arg=$(flag))
 
 HEADERS := $(shell find -L $(SRCDIR) -type f -name "*.$(HEADEXT)")
@@ -89,11 +91,10 @@ $(OBJDIR)/$(TESTDIR)/%.$(OBJEXT): $(TESTDIR)/%.$(SRCEXT)
 
 # Build source objects
 $(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
-	@echo -n Building $@ "... "
+	@echo Building $@ "... "
 	@$(CTIDY) $(TIDYFLAGS) $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INCFLAGS) -c $< -o $@
-	@echo done!
 
 # Build project binary
 $(BINDIR)/$(PROJECT): $(OBJECTS)

@@ -24,7 +24,11 @@ class EventEmitter
 {
 public:
   EventEmitter(sf::Window& window, plug::TransformStack& stack) :
-      m_window(window), m_stack(stack)
+      m_window(window),
+      m_stack(stack),
+      m_shiftPressed(false),
+      m_ctrlPressed(false),
+      m_altPressed(false)
   {
   }
 
