@@ -3,7 +3,7 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 
-#include "EventEmitter.h"
+#include "Impl/EventManager/SfmlEventManager.h"
 #include "GUI/Button.h"
 #include "GUI/Widget.h"
 #include "Impl/LayoutBox/LayoutBox.h"
@@ -58,12 +58,12 @@ void Photoshop::initGUI(void)
 void Photoshop::runMainLoop(void)
 {
   TransformStack   stack;
-  EventEmitter     emitter(m_window, stack);
+  SfmlEventManager event_manager(m_window, stack);
   SfmlRenderTarget wrapped_rt(m_window);
 
   while (m_window.isOpen())
   {
-    emitter.sendEvents(m_widgetTree);
+    event_manager.sendEvents(m_widgetTree);
     if (!m_window.isOpen())
     {
       break;
