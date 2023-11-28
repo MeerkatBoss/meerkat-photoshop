@@ -17,6 +17,7 @@ void Canvas::draw(const plug::VertexArray& vertex_array)
 
   SfmlRenderTarget target(m_renderTexture);
   target.draw(vertex_array);
+  m_cacheState = InvalidRawTexture;
 }
 
 void Canvas::draw(const plug::VertexArray& vertex_array,
@@ -29,6 +30,7 @@ void Canvas::draw(const plug::VertexArray& vertex_array,
 
   SfmlRenderTarget target(m_renderTexture);
   target.draw(vertex_array, texture);
+  m_cacheState = InvalidRawTexture;
 }
 
 void Canvas::setSize(const plug::Vec2d& size)
@@ -82,7 +84,7 @@ void Canvas::copyRenderToRaw(void) const
   {
     for (size_t y = 0; y < m_height; ++y)
     {
-      m_rawTexture->data[y * m_width + x] = getPlugColor(image.getPixel(x, y));
+      m_rawTexture->setPixel(x, y, getPlugColor(image.getPixel(x, y)));
     }
   }
   m_cacheState = Valid;

@@ -22,6 +22,7 @@ class Canvas : plug::Canvas
 {
 public:
   Canvas(size_t width, size_t height) :
+      m_cacheState(Valid),
       m_width(width),
       m_height(height),
       m_mask(width, height),
@@ -30,7 +31,10 @@ public:
     m_renderTexture.create(width, height);
   }
 
-  virtual ~Canvas(void) override = default;
+  virtual ~Canvas(void) override
+  {
+    delete m_rawTexture;
+  }
 
   virtual void draw(const plug::VertexArray& vertex_array) override;
 

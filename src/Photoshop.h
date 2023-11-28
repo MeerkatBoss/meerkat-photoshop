@@ -13,6 +13,7 @@
 #define __PHOTOSHOP_H
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include "Canvas/Canvas.h"
 #include "Plug/Widget.h"
 
 class Photoshop
@@ -25,6 +26,7 @@ public:
 
   void runMainLoop(void);
 private:
+  Canvas m_canvas;
 
   plug::Widget* m_widgetTree;
   sf::RenderWindow m_window;

@@ -3,6 +3,7 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 
+#include "GUI/CanvasView.h"
 #include "Impl/EventManager/SfmlEventManager.h"
 #include "GUI/Button.h"
 #include "GUI/Widget.h"
@@ -27,6 +28,7 @@ public:
 DebugController g_debugController;
 
 Photoshop::Photoshop(size_t width, size_t height) :
+    m_canvas(1000, 1000),
     m_widgetTree(nullptr),
     m_window(sf::VideoMode(width, height), "Photoshop", sf::Style::Close)
 {
@@ -49,8 +51,12 @@ void Photoshop::initGUI(void)
   LayoutBox root_box(Length(m_window.getSize().x, Unit::Pixel),
                      Length(m_window.getSize().y, Unit::Pixel));
 
+  /*
   m_widgetTree =
       new gui::Button(g_debugController, LayoutBox(5_cm, 5_cm, Align::Center));
+  */
+  m_widgetTree =
+    new gui::CanvasView(m_canvas, LayoutBox(15_cm, 15_cm, Align::Center));
 
   m_widgetTree->onParentUpdate(root_box);
 }
