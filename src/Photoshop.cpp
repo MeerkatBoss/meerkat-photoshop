@@ -31,7 +31,7 @@ public:
 DebugController g_debugController;
 
 Photoshop::Photoshop(size_t width, size_t height) :
-    m_canvas(1000, 1000),
+    m_canvas("New File", 1000, 1000),
     m_tools(),
     m_colors(),
     m_widgetTree(nullptr),
