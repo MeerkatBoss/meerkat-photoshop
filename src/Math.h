@@ -15,7 +15,6 @@
 #include "Plug/Math.h"
 using plug::Vec2d;
 using plug::Transform;
-using plug::TransformStack;
 using plug::dot;
 using plug::cross;
 using plug::normalize;

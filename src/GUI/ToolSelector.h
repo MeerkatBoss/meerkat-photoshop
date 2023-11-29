@@ -29,7 +29,7 @@ public:
   {
   }
 
-  virtual void draw(TransformStack&, plug::RenderTarget&) override
+  virtual void draw(plug::TransformStack&, plug::RenderTarget&) override
   {
     /* TODO: Draw tool selection buttons */
   }

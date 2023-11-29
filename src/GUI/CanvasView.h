@@ -14,6 +14,7 @@
 
 #include "Canvas/Canvas.h"
 #include "GUI/Widget.h"
+#include "Tool/ToolPalette.h"
 
 namespace gui
 {
@@ -21,8 +22,9 @@ namespace gui
 class CanvasView : public Widget
 {
 public:
-  CanvasView(Canvas& canvas, const plug::LayoutBox& layout_box) :
-      Widget(layout_box), m_canvas(canvas), m_isDrawing(false)
+  CanvasView(ToolPalette& palette, Canvas& canvas,
+             const plug::LayoutBox& layout_box) :
+      Widget(layout_box), m_palette(palette), m_canvas(canvas)
   {
   }
 
@@ -39,17 +41,17 @@ protected:
   virtual void onMouseMove(const plug::MouseMoveEvent& event,
                            plug::EHC&                  context) override;
 
+  virtual void onKeyboardPressed(const plug::KeyboardPressedEvent& event,
+                                 plug::EHC& context) override;
+
+  virtual void onKeyboardReleased(const plug::KeyboardReleasedEvent& event,
+                                  plug::EHC& context) override;
+
 private:
   plug::Transform getCanvasTransform(void) const;
 
-  void drawLine(const plug::Vec2d start, const plug::Vec2d end,
-                double thickness);
-
-  Canvas& m_canvas;
-
-  bool m_isDrawing;
-
-  plug::Vec2d m_lastPos;
+  ToolPalette& m_palette;
+  Canvas&      m_canvas;
 };
 
 } // namespace gui

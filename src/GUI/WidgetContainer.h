@@ -35,11 +35,10 @@ public:
     }
   }
 
-  virtual void onEvent(const plug::Event& event,
-                       plug::EHC& context) override;
+  virtual void onEvent(const plug::Event& event, plug::EHC& context) override;
 
-  virtual void draw(TransformStack&     transform_stack,
-                    plug::RenderTarget& draw_target) override;
+  virtual void draw(plug::TransformStack& transform_stack,
+                    plug::RenderTarget&   draw_target) override;
 
   virtual void onParentUpdate(const plug::LayoutBox& parent_box) override;
 

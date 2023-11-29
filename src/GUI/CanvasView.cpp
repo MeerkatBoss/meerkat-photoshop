@@ -5,8 +5,6 @@
 namespace gui
 {
 
-static constexpr double THICKNESS = 10;
-
 void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 {
   using plug::Vec2d;
@@ -27,6 +25,14 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   array[3] = Vertex{.position = stack.apply(br), .tex_coords = tex_br};
 
   target.draw(array, m_canvas.getTexture());
+
+  plug::Widget* tool_widget = m_palette.getActiveTool().getWidget();
+  if (tool_widget != nullptr)
+  {
+    stack.enter(getCanvasTransform());
+    tool_widget->draw(stack, target);
+    stack.leave();
+  }
 }
 
 void CanvasView::onMousePressed(const plug::MousePressedEvent& event,
@@ -40,15 +46,23 @@ void CanvasView::onMousePressed(const plug::MousePressedEvent& event,
   if (covers(context.stack, event.pos))
   {
     context.overlapped = true;
-    if (event.button_id == plug::MouseButton::Left && !m_isDrawing)
+    if (event.button_id == plug::MouseButton::Left)
     {
       context.stopped = true;
       context.stack.enter(getCanvasTransform());
 
-      m_isDrawing = true;
-      m_lastPos   = event.pos;
-      drawLine(context.stack.restore(event.pos),
-               context.stack.restore(event.pos), THICKNESS);
+      m_palette.getActiveTool().onMainButton({plug::State::Pressed},
+                                             context.stack.restore(event.pos));
+
+      context.stack.leave();
+    }
+    else if (event.button_id == plug::MouseButton::Right)
+    {
+      context.stopped = true;
+      context.stack.enter(getCanvasTransform());
+
+      m_palette.getActiveTool().onSecondaryButton(
+          {plug::State::Pressed}, context.stack.restore(event.pos));
 
       context.stack.leave();
     }
@@ -62,14 +76,26 @@ void CanvasView::onMouseReleased(const plug::MouseReleasedEvent& event,
   {
     context.overlapped = true;
   }
-  if (m_isDrawing)
-  {
-    context.stack.enter(getCanvasTransform());
-    drawLine(context.stack.restore(event.pos), context.stack.restore(event.pos),
-             THICKNESS);
-    context.stack.leave();
 
-    m_isDrawing = false;
+  if (event.button_id == plug::MouseButton::Left)
+  {
+    context.stopped = true;
+    context.stack.enter(getCanvasTransform());
+
+    m_palette.getActiveTool().onMainButton({plug::State::Released},
+                                           context.stack.restore(event.pos));
+
+    context.stack.leave();
+  }
+  else if (event.button_id == plug::MouseButton::Right)
+  {
+    context.stopped = true;
+    context.stack.enter(getCanvasTransform());
+
+    m_palette.getActiveTool().onSecondaryButton(
+        {plug::State::Released}, context.stack.restore(event.pos));
+
+    context.stack.leave();
   }
 }
 
@@ -83,14 +109,61 @@ void CanvasView::onMouseMove(const plug::MouseMoveEvent& event,
   if (covers(context.stack, event.pos))
   {
     context.overlapped = true;
-    if (m_isDrawing)
-    {
-      context.stack.enter(getCanvasTransform());
-      drawLine(context.stack.restore(m_lastPos),
-               context.stack.restore(event.pos), THICKNESS);
-      context.stack.leave();
-      m_lastPos = event.pos;
-    }
+  }
+
+  context.stack.enter(getCanvasTransform());
+  m_palette.getActiveTool().onMove(context.stack.restore(event.pos));
+  context.stack.leave();
+}
+
+void CanvasView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
+                                   plug::EHC&                        context)
+{
+  if (context.stopped)
+  {
+    return;
+  }
+  if (event.key_id == plug::KeyCode::LShift ||
+      event.key_id == plug::KeyCode::RShift)
+  {
+    context.stopped = true;
+    m_palette.getActiveTool().onModifier1({plug::State::Pressed});
+  }
+  if (event.key_id == plug::KeyCode::LControl ||
+      event.key_id == plug::KeyCode::RControl)
+  {
+    context.stopped = true;
+    m_palette.getActiveTool().onModifier2({plug::State::Pressed});
+  }
+  if (event.key_id == plug::KeyCode::LAlt ||
+      event.key_id == plug::KeyCode::RAlt)
+  {
+    context.stopped = true;
+    m_palette.getActiveTool().onModifier3({plug::State::Pressed});
+  }
+}
+
+void CanvasView::onKeyboardReleased(const plug::KeyboardReleasedEvent& event,
+                                   plug::EHC&                        context)
+{
+  if (context.stopped)
+  {
+    return;
+  }
+  if (event.key_id == plug::KeyCode::LShift ||
+      event.key_id == plug::KeyCode::RShift)
+  {
+    m_palette.getActiveTool().onModifier1({plug::State::Released});
+  }
+  if (event.key_id == plug::KeyCode::LControl ||
+      event.key_id == plug::KeyCode::RControl)
+  {
+    m_palette.getActiveTool().onModifier2({plug::State::Released});
+  }
+  if (event.key_id == plug::KeyCode::LAlt ||
+      event.key_id == plug::KeyCode::RAlt)
+  {
+    m_palette.getActiveTool().onModifier3({plug::State::Released});
   }
 }
 
@@ -98,38 +171,6 @@ plug::Transform CanvasView::getCanvasTransform(void) const
 {
   return plug::Transform(getLayoutBox().getPosition(),
                          getLayoutBox().getSize() / m_canvas.getSize());
-}
-
-void CanvasView::drawLine(const plug::Vec2d start, const plug::Vec2d end,
-                          double thickness)
-{
-  const size_t      point_count = 20;
-  const plug::Color brush_color(0, 0, 0);
-
-  const plug::Vec2d direction = end - start;
-  plug::VertexArray array(plug::TriangleFan, point_count + 1);
-
-  for (size_t i = 0; i < point_count; ++i)
-  {
-    const double      angle = i * (2 * M_PI / point_count);
-    const plug::Vec2d offset(cos(angle), sin(angle));
-
-    if (dot(offset, direction) < 0)
-    {
-      array[i] = plug::Vertex{.position   = start + thickness * offset,
-                              .tex_coords = plug::Vec2d(),
-                              .color      = brush_color};
-    }
-    else
-    {
-      array[i] = plug::Vertex{.position   = end + thickness * offset,
-                              .tex_coords = plug::Vec2d(),
-                              .color      = brush_color};
-    }
-  }
-  array[point_count] = array[0];
-
-  m_canvas.draw(array);
 }
 
 } // namespace gui

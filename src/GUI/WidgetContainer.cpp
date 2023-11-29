@@ -12,7 +12,7 @@ void WidgetContainer::onEvent(const plug::Event& event,
   }
 }
 
-void WidgetContainer::draw(TransformStack&     transform_stack,
+void WidgetContainer::draw(plug::TransformStack&     transform_stack,
                            plug::RenderTarget& draw_target)
 {
   if (m_widgets.isEmpty())

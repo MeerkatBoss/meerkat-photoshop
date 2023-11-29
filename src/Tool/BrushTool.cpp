@@ -1,5 +1,7 @@
 #include "Tool/BrushTool.h"
 
+#include <cstdio>
+
 const BrushTool::BrushData BrushTool::s_pluginData = BrushData();
 
 void BrushTool::onMove(const Vec2d& position)
@@ -63,4 +65,3 @@ void BrushTool::drawLine(const Vec2d& start, const Vec2d& end) const
 
   m_activeCanvas->draw(array);
 }
-

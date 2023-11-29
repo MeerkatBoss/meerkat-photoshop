@@ -18,7 +18,7 @@
 #include "Canvas/SelectionMask.h"
 #include "Plug/Canvas/Canvas.h"
 
-class Canvas : plug::Canvas
+class Canvas : public plug::Canvas
 {
 public:
   Canvas(size_t width, size_t height) :

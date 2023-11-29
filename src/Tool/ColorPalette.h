@@ -43,7 +43,7 @@ public:
     m_backgroundColor = new_bg_color;
   }
 
-  virtual ~ColorPalette() override;
+  virtual ~ColorPalette() override {}
 
 private:
   plug::Color m_foregroundColor, m_backgroundColor;
