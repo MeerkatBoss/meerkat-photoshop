@@ -3,13 +3,16 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 
-#include "GUI/CanvasView.h"
-#include "Impl/EventManager/SfmlEventManager.h"
 #include "GUI/Button.h"
+#include "GUI/CanvasView.h"
+#include "GUI/ToolSelector.h"
 #include "GUI/Widget.h"
+#include "GUI/WidgetContainer.h"
+#include "Impl/EventManager/SfmlEventManager.h"
 #include "Impl/LayoutBox/LayoutBox.h"
 #include "Impl/RenderTarget/SfmlRenderTarget/RenderTarget.h"
 #include "Impl/TransformStack.h"
+#include "Tool/BrushTool.h"
 
 class DebugController : public gui::ButtonController
 {
@@ -29,9 +32,14 @@ DebugController g_debugController;
 
 Photoshop::Photoshop(size_t width, size_t height) :
     m_canvas(1000, 1000),
+    m_tools(),
+    m_colors(),
     m_widgetTree(nullptr),
     m_window(sf::VideoMode(width, height), "Photoshop", sf::Style::Close)
 {
+  m_tools.addTool(new BrushTool(10));
+  m_tools.setActiveCanvas(m_canvas);
+  m_tools.setColorPalette(m_colors);
 }
 
 Photoshop::~Photoshop(void)
@@ -55,9 +63,13 @@ void Photoshop::initGUI(void)
   m_widgetTree =
       new gui::Button(g_debugController, LayoutBox(5_cm, 5_cm, Align::Center));
   */
-  m_widgetTree =
-    new gui::CanvasView(m_canvas, LayoutBox(15_cm, 15_cm, Align::Center));
+  gui::WidgetContainer* root =
+      new gui::WidgetContainer(LayoutBox(100_per, 100_per, Align::Center));
+  root->addWidget(new gui::ToolSelector(m_tools));
+  root->addWidget(new gui::CanvasView(m_tools, m_canvas,
+                                      LayoutBox(15_cm, 15_cm, Align::Center)));
 
+  m_widgetTree = root;
   m_widgetTree->onParentUpdate(root_box);
 }
 
