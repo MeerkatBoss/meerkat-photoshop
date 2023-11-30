@@ -23,6 +23,7 @@ public:
   EditorState(void) :
       m_activeCanvas(nullptr), m_canvases(), m_tools(), m_colors()
   {
+    m_tools.setColorPalette(m_colors);
   }
   EditorState(const EditorState& other) = delete;
   EditorState& operator=(const EditorState& other) = delete;
@@ -46,6 +47,10 @@ public:
 
   Canvas*       getActiveCanvas(void) { return m_activeCanvas; }
   const Canvas* getActiveCanvas(void) const { return m_activeCanvas; }
+
+  size_t getCanvasCount(void) const { return m_canvases.getSize(); }
+
+  const DynArray<Canvas*>& getAllCanvases(void) const { return m_canvases; }
 
   void setActiveCanvas(Canvas* canvas);
 

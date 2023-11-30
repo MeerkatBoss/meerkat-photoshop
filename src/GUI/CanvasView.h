@@ -28,6 +28,9 @@ public:
   {
   }
 
+  Canvas&       getCanvas(void) { return m_canvas; }
+  const Canvas& getCanvas(void) const { return m_canvas; }
+
   virtual void draw(plug::TransformStack& stack,
                     plug::RenderTarget&   target) override;
 
