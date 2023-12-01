@@ -4,3 +4,6 @@ build/
 **/compile_commands.json
 *.log
 .log/
+/*.png
+/*.jpg
+/*.jpeg

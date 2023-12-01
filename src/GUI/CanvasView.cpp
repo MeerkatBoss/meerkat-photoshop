@@ -27,7 +27,7 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   target.draw(array, m_canvas.getTexture());
 
   plug::Widget* tool_widget = m_palette.getActiveTool().getWidget();
-  if (tool_widget != nullptr)
+  if (m_isFocused && tool_widget != nullptr)
   {
     stack.enter(getCanvasTransform());
     tool_widget->draw(stack, target);

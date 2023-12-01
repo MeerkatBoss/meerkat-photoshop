@@ -16,11 +16,15 @@
 
 #include "DynArray.h"
 #include "Plug/Tool.h"
+#include "Tool/ColorPalette.h"
 
 class ToolPalette
 {
 public:
-  ToolPalette(void) : m_tools(), m_activeTool(nullptr) {}
+  ToolPalette(void) :
+      m_colors(nullptr), m_canvas(nullptr), m_tools(), m_activeTool(nullptr)
+  {
+  }
 
   ~ToolPalette(void)
   {
@@ -36,6 +40,7 @@ public:
     {
       m_tools[i]->setColorPalette(palette);
     }
+    m_colors = &palette;
   }
 
   void setActiveCanvas(plug::Canvas& canvas)
@@ -44,10 +49,19 @@ public:
     {
       m_tools[i]->setActiveCanvas(canvas);
     }
+    m_canvas = &canvas;
   }
 
   void addTool(plug::Tool* tool)
   {
+    if (m_colors != nullptr)
+    {
+      tool->setColorPalette(*m_colors);
+    }
+    if (m_canvas != nullptr)
+    {
+      tool->setActiveCanvas(*m_canvas);
+    }
     m_tools.pushBack(tool);
     if (m_activeTool == nullptr)
       m_activeTool = m_tools.back();
@@ -68,12 +82,16 @@ public:
     m_activeTool = m_tools[tool_idx];
   }
 
-  plug::Tool& getActiveTool(void) {
+  plug::Tool& getActiveTool(void)
+  {
     assert(m_activeTool != nullptr);
     return *m_activeTool;
   }
 
 private:
+  plug::ColorPalette* m_colors;
+  plug::Canvas* m_canvas;
+
   DynArray<plug::Tool*> m_tools;
   plug::Tool*           m_activeTool;
 };
