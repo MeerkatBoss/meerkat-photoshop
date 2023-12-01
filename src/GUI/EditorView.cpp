@@ -19,7 +19,13 @@ void EditorView::addCanvasView(CanvasView* canvas_view)
 
   canvas_view->onParentUpdate(getLayoutBox());
   m_views.pushBack(canvas_view);
+
+  if (m_activeView != nullptr)
+  {
+    m_activeView->unfocus();
+  }
   m_activeView = canvas_view;
+  m_activeView->focus();
 }
 
 void EditorView::setActiveView(CanvasView* canvas_view)
@@ -35,8 +41,6 @@ void EditorView::setActiveView(CanvasView* canvas_view)
     }
   }
 }
-
-static Transform getCanvasTransform(const CanvasView* view);
 
 void EditorView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 {
@@ -54,14 +58,6 @@ void EditorView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   if (m_activeView != nullptr)
   {
     m_activeView->draw(stack, target);
-    plug::Widget* toolWidget =
-        m_editorState.getTools().getActiveTool().getWidget();
-    if (toolWidget != nullptr)
-    {
-      stack.enter(getCanvasTransform(m_activeView));
-      toolWidget->draw(stack, target);
-      stack.leave();
-    }
   }
 
   m_toolSelector.draw(stack, target);
@@ -72,6 +68,8 @@ void EditorView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 void EditorView::onEvent(const plug::Event& event, plug::EHC& context)
 {
   Widget::onEvent(event, context);
+
+  context.stack.enter(Transform(getLayoutBox().getPosition()));
 
   m_toolSelector.onEvent(event, context);
 
@@ -88,6 +86,8 @@ void EditorView::onEvent(const plug::Event& event, plug::EHC& context)
       m_views[i]->onEvent(event, context);
     }
   }
+
+  context.stack.leave();
 }
 
 void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
@@ -101,12 +101,4 @@ void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
     m_views[i]->onParentUpdate(getLayoutBox());
   }
 }
-
-static Transform getCanvasTransform(const CanvasView* view)
-{
-  return Transform(view->getLayoutBox().getPosition(),
-                   view->getLayoutBox().getSize() /
-                       view->getCanvas().getSize());
-}
-
 } // namespace gui

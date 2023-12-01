@@ -10,6 +10,7 @@ void EditorState::setActiveCanvas(Canvas* canvas)
     if (canvas == m_canvases[i])
     {
       m_activeCanvas = canvas;
+      m_tools.setActiveCanvas(*m_activeCanvas);
       return;
     }
   }
@@ -37,7 +38,7 @@ void EditorState::openCanvas(const char* filename)
   }
 
   m_canvases.pushBack(opened);
-  m_activeCanvas = opened;
+  setActiveCanvas(opened);
 }
 
 void EditorState::saveCanvas(const Canvas* canvas)

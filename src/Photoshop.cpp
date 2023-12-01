@@ -3,8 +3,10 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 
+#include "EditorState.h"
 #include "GUI/Button.h"
 #include "GUI/CanvasView.h"
+#include "GUI/EditorView.h"
 #include "GUI/ToolSelector.h"
 #include "GUI/Widget.h"
 #include "GUI/WidgetContainer.h"
@@ -31,15 +33,12 @@ public:
 DebugController g_debugController;
 
 Photoshop::Photoshop(size_t width, size_t height) :
-    m_canvas("New File", 1000, 1000),
-    m_tools(),
-    m_colors(),
+    m_editorState(),
     m_widgetTree(nullptr),
     m_window(sf::VideoMode(width, height), "Photoshop", sf::Style::Close)
 {
-  m_tools.addTool(new BrushTool(10));
-  m_tools.setActiveCanvas(m_canvas);
-  m_tools.setColorPalette(m_colors);
+  m_editorState.getTools().addTool(new BrushTool(10));
+  m_editorState.newCanvas("Untitled.png", 1000, 1000);
 }
 
 Photoshop::~Photoshop(void)
@@ -65,9 +64,14 @@ void Photoshop::initGUI(void)
   */
   gui::WidgetContainer* root =
       new gui::WidgetContainer(LayoutBox(100_per, 100_per, Align::Center));
-  root->addWidget(new gui::ToolSelector(m_tools));
-  root->addWidget(new gui::CanvasView(m_tools, m_canvas,
-                                      LayoutBox(15_cm, 15_cm, Align::Center)));
+
+  gui::EditorView* editor_view = new gui::EditorView(
+      m_editorState, LayoutBox(100_per, 100_per, Align::Center));
+  editor_view->addCanvasView(new gui::CanvasView(
+      m_editorState.getTools(), *m_editorState.getActiveCanvas(),
+      LayoutBox(15_cm, 15_cm, Align::Center)));
+
+  root->addWidget(editor_view);
 
   m_widgetTree = root;
   m_widgetTree->onParentUpdate(root_box);

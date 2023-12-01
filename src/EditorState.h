@@ -60,7 +60,9 @@ public:
 
   void newCanvas(const char* name, size_t width, size_t height)
   {
-    m_canvases.pushBack(new Canvas(name, width, height));
+    Canvas* canvas = new Canvas(name, width, height);
+    m_canvases.pushBack(canvas);
+    setActiveCanvas(canvas);
   }
 
   void openCanvas(const char* filename);

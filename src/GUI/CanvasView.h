@@ -24,9 +24,15 @@ class CanvasView : public Widget
 public:
   CanvasView(ToolPalette& palette, Canvas& canvas,
              const plug::LayoutBox& layout_box) :
-      Widget(layout_box), m_palette(palette), m_canvas(canvas)
+      Widget(layout_box),
+      m_palette(palette),
+      m_canvas(canvas),
+      m_isFocused(false)
   {
   }
+
+  void focus(void) { m_isFocused = true; }
+  void unfocus(void) { m_isFocused = false; }
 
   Canvas&       getCanvas(void) { return m_canvas; }
   const Canvas& getCanvas(void) const { return m_canvas; }
@@ -55,6 +61,8 @@ private:
 
   ToolPalette& m_palette;
   Canvas&      m_canvas;
+
+  bool m_isFocused;
 };
 
 } // namespace gui

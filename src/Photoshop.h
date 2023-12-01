@@ -13,9 +13,9 @@
 #define __PHOTOSHOP_H
 
 #include <SFML/Graphics/RenderWindow.hpp>
+
 #include "Canvas/Canvas.h"
-#include "Tool/ColorPalette.h"
-#include "Tool/ToolPalette.h"
+#include "EditorState.h"
 #include "Plug/Widget.h"
 
 class Photoshop
@@ -27,13 +27,10 @@ public:
   void initGUI(void);
 
   void runMainLoop(void);
-private:
-  /* TODO: Extract to EditorState */
-  Canvas m_canvas;
-  ToolPalette m_tools;
-  ColorPalette m_colors;
 
-  plug::Widget* m_widgetTree;
+private:
+  EditorState      m_editorState;
+  plug::Widget*    m_widgetTree;
   sf::RenderWindow m_window;
 };
 
