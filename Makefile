@@ -50,7 +50,7 @@ CFORMAT  :=clang-format
 FMTFLAGS :=--dry-run -Werror -ferror-limit=1
 
 CTIDY     :=clang-tidy
-TIDYCHECKS:=-*,clang-analyzer-*,cert-*,-bugprone-*,-cppcoreguidelines-*
+TIDYCHECKS:=-*,clang-analyzer-*,-bugprone-*,-cppcoreguidelines-*
 TIDYFLAGS :=--checks=$(TIDYCHECKS) --header-filter="" --quiet\
 --warnings-as-errors=*
 

@@ -16,6 +16,7 @@
 
 #include "Canvas/Canvas.h"
 #include "EditorState.h"
+#include "LogHelpers.h"
 #include "Plug/Widget.h"
 
 class Photoshop
@@ -29,6 +30,8 @@ public:
   void runMainLoop(void);
 
 private:
+  static Logger s_logger;
+
   EditorState      m_editorState;
   plug::Widget*    m_widgetTree;
   sf::RenderWindow m_window;

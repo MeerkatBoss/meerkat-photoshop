@@ -14,7 +14,10 @@
 #include "Impl/LayoutBox/LayoutBox.h"
 #include "Impl/RenderTarget/SfmlRenderTarget/RenderTarget.h"
 #include "Impl/TransformStack.h"
+#include "LogHelpers.h"
 #include "Tool/BrushTool.h"
+
+Logger Photoshop::s_logger = Logger("Photoshop");
 
 class DebugController : public gui::ButtonController
 {
@@ -37,8 +40,16 @@ Photoshop::Photoshop(size_t width, size_t height) :
     m_widgetTree(nullptr),
     m_window(sf::VideoMode(width, height), "Photoshop", sf::Style::Close)
 {
+  LOG_ASSERT(s_logger, width > 0, "Width is zero!");
+  LOG_ASSERT(s_logger, height > 0, "Height is zero!");
+
+  s_logger.LOG_INFO(ContentType::TEXT, "Opened Photoshop window %zux%zu", width,
+                    height);
+
   m_editorState.getTools().addTool(new BrushTool(10));
   m_editorState.newCanvas("Untitled.png", 1000, 1000);
+
+  s_logger.LOG_TRACE(ContentType::TEXT, "Created Photoshop instance");
 }
 
 Photoshop::~Photoshop(void)
@@ -51,6 +62,8 @@ Photoshop::~Photoshop(void)
   {
     m_window.close();
   }
+
+  s_logger.LOG_TRACE(ContentType::TEXT, "Destroyed Photoshop instance");
 }
 
 void Photoshop::initGUI(void)
@@ -75,6 +88,8 @@ void Photoshop::initGUI(void)
 
   m_widgetTree = root;
   m_widgetTree->onParentUpdate(root_box);
+
+  s_logger.LOG_TRACE(ContentType::TEXT, "Initialized Photoshop GUI");
 }
 
 void Photoshop::runMainLoop(void)
@@ -83,6 +98,7 @@ void Photoshop::runMainLoop(void)
   SfmlEventManager event_manager(m_window, stack);
   SfmlRenderTarget wrapped_rt(m_window);
 
+  s_logger.LOG_TRACE(ContentType::TEXT, "Entering Photoshop main loop");
   while (m_window.isOpen())
   {
     event_manager.sendEvents(m_widgetTree);
@@ -94,4 +110,5 @@ void Photoshop::runMainLoop(void)
     m_widgetTree->draw(stack, wrapped_rt);
     m_window.display();
   }
+  s_logger.LOG_TRACE(ContentType::TEXT, "Leaving Photoshop main loop");
 }
