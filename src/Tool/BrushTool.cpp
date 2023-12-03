@@ -1,11 +1,13 @@
 #include "Tool/BrushTool.h"
 
+#include <cassert>
 #include <cstdio>
-
-const BrushTool::BrushData BrushTool::s_pluginData = BrushData();
+#include "Tool/BaseTool.h"
 
 void BrushTool::onMove(const Vec2d& position)
 {
+  BaseTool::onMove(position);
+
   if (m_isDrawing)
   {
     drawLine(m_lastPos, position);
@@ -16,6 +18,8 @@ void BrushTool::onMove(const Vec2d& position)
 void BrushTool::onMainButton(const plug::ControlState& state,
                              const Vec2d&              position)
 {
+  BaseTool::onMainButton(state, position);
+
   drawLine(position, position);
 
   if (state.state == plug::State::Pressed)
@@ -29,16 +33,16 @@ void BrushTool::onMainButton(const plug::ControlState& state,
   }
 }
 
-void BrushTool::drawLine(const Vec2d& start, const Vec2d& end) const
+void BrushTool::drawLine(const Vec2d& start, const Vec2d& end)
 {
-  if (m_activeCanvas == nullptr)
+  if (!hasActiveCanvas())
   {
     return;
   }
-  assert(m_colorPalette != nullptr);
+  assert(hasColorPalette());
 
   const size_t      point_count = 20;
-  const plug::Color brush_color = m_colorPalette->getFGColor();
+  const plug::Color brush_color = getColorPalette().getFGColor();
 
   const plug::Vec2d direction = end - start;
   plug::VertexArray array(plug::TriangleFan, point_count + 1);
@@ -63,5 +67,5 @@ void BrushTool::drawLine(const Vec2d& start, const Vec2d& end) const
   }
   array[point_count] = array[0];
 
-  m_activeCanvas->draw(array);
+  getActiveCanvas().draw(array);
 }

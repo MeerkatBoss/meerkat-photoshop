@@ -94,7 +94,8 @@ $(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@echo Building $@ "... "
 	@$(CTIDY) $(TIDYFLAGS) $<
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $(INCFLAGS) -c $< -o $@
+	@$(CC) $(if $(filter $<,$(TRACED)),,-DNLOG_TRACE)\
+		$(CFLAGS) $(INCFLAGS) -c $< -o $@
 
 # Build project binary
 $(BINDIR)/$(PROJECT): $(OBJECTS)

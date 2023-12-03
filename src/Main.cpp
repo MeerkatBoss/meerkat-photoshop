@@ -54,6 +54,6 @@ int main()
   app.initGUI();
   app.runMainLoop();
 
-  logger.LOG_INFO(ContentType::TEXT, "Finished logs");
+  logger.LOG_INFO(ContentType::TEXT, "Finishing program");
   return 0;
 }

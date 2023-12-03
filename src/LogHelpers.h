@@ -18,43 +18,43 @@
 
 using mklog::Logger;
 using ContentType = mklog::MessageContentType;
+using Content     = mklog::MessageContentType;
 using MessageFd   = mklog::LogManager::MessageFd;
 
 #ifndef NLOGS
 
 #ifndef NASSERT
 
-#define LOG_ASSERT(logger, condition, message)                            \
-  do                                                                      \
-  {                                                                       \
-    if (!(condition))                                                     \
-    {                                                                     \
-      logger.LOG_FATAL(ContentType::TEXT,                                 \
-                       "Failed assertion '" #condition "': %s", message); \
-      abort();                                                            \
-    }                                                                     \
+#define LOG_ASSERT(logger, condition, ...)                                 \
+  do                                                                       \
+  {                                                                        \
+    if (!(condition))                                                      \
+    {                                                                      \
+      logger.LOG_FATAL(ContentType::TEXT,                                  \
+                       "Failed assertion '" #condition "': " __VA_ARGS__); \
+      abort();                                                             \
+    }                                                                      \
   } while (0)
 
 #else
 
-#define LOG_ASSERT(logger, condition, message)                              \
-  do                                                                        \
-  {                                                                         \
-    if (!(condition))                                                       \
-    {                                                                       \
-      logger.LOG_WARNING(ContentType::TEXT,                                 \
-                         "Failed assertion '" #condition "': %s", message); \
-    }                                                                       \
+#define LOG_ASSERT(logger, condition, ...)                                   \
+  do                                                                         \
+  {                                                                          \
+    if (!(condition))                                                        \
+    {                                                                        \
+      logger.LOG_WARNING(ContentType::TEXT,                                  \
+                         "Failed assertion '" #condition "': " __VA_ARGS__); \
+    }                                                                        \
   } while (0)
 
 #endif // NASSERT
-
 
 #else
 
 #ifndef NASSERT
 
-#define LOG_ASSERT(logger, condition, message) assert((condition) && message)
+#define LOG_ASSERT(logger, condition, ...) assert((condition))
 
 #else
 
