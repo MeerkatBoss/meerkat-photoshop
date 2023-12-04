@@ -27,6 +27,8 @@ public:
 
   void initGUI(void);
 
+  void loadPlugins(const char* plugdir) { m_editorState.loadPlugins(plugdir); }
+
   void runMainLoop(void);
 
 private:

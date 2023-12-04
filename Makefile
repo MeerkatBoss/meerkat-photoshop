@@ -42,10 +42,10 @@ CMACHINE:=-mavx512f -march=native -mtune=native
 
 CFLAGS:=-std=c++17 -fPIE -fPIC $(CMACHINE) $(CWARN) -DSFML_STATIC
 INCFLAGS:= -I$(SRCDIR) -I$(INCDIR) -I$(COMMONDIR)
-LFLAGS  := -lsfml-graphics -lsfml-window -lsfml-system
+LFLAGS  := -lsfml-graphics -lsfml-window -lsfml-system -ldl
 
 ifeq ($(BUILDTYPE), Release)
-	CFLAGS:=-O3 $(CFLAGS)
+	CFLAGS:=-O2 -DNASSERT $(CFLAGS)
 else
 	CFLAGS:=-O0 $(CDEBUG) $(CFLAGS)
 endif
@@ -69,9 +69,11 @@ EXPORTBINS := $(patsubst $(EXPORTDIR)/%,$(EXPORTBINDIR)/%,$(EXPORTS:.$(SRCEXT)=.
 MAINSRC := src/Main.cpp
 MAINOBJ := obj/Main.o
 
-all: $(BINDIR)/$(PROJECT) $(EXPORTBINS)
+all: export $(BINDIR)/$(PROJECT)
 
 export: $(EXPORTBINS)
+	@$(foreach bin,$<,mkdir -p Plugins/$(basename $(notdir $(bin)))/;)
+	@$(foreach bin,$<,cp -f -t Plugins/$(basename $(notdir $(bin)))/ $(bin);)
 
 remake: cleaner all
 
@@ -85,7 +87,7 @@ init:
 
 # Build source objects
 $(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
-	@echo Building $@ "... "
+	@echo Building $@
 	@$(CTIDY) $(TIDYFLAGS) $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(if $(filter $<,$(TRACED)),,-DNLOG_TRACE)\
@@ -93,7 +95,7 @@ $(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 
 # Build plugin binaries
 $(EXPORTBINDIR)/%.so: $(EXPORTOBJDIR)/%.$(OBJEXT) $(COMMONOBJS)
-	@echo Building plugin $@ "... "
+	@echo Building plugin $(basename $(notdir $@))
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -shared $^ -o $@
 

@@ -30,7 +30,7 @@ public:
   {
     for (size_t i = 0; i < m_tools.getSize(); ++i)
     {
-      delete m_tools[i];
+      m_tools[i]->release();
     }
   }
 
