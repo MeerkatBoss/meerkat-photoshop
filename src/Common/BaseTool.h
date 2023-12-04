@@ -14,7 +14,7 @@
 
 #include "LogHelpers.h"
 #include "Math.h"
-#include "Plug/Tool.h"
+#include "Common/Plug/Tool.h"
 
 class BaseTool : public plug::Tool
 {

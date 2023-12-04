@@ -12,7 +12,7 @@
 #ifndef __GUI_TOOL_SELECTOR_H
 #define __GUI_TOOL_SELECTOR_H
 
-#include "GUI/Widget.h"
+#include "Common/GUI/Widget.h"
 #include "Impl/LayoutBox/LayoutBox.h"
 #include "Math.h"
 #include "Tool/ToolPalette.h"

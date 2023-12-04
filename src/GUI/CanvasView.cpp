@@ -1,6 +1,6 @@
 #include "GUI/CanvasView.h"
 
-#include "GUI/Widget.h"
+#include "Common/GUI/Widget.h"
 
 namespace gui
 {

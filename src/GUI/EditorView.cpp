@@ -1,7 +1,7 @@
 #include "GUI/EditorView.h"
 
 #include "GUI/CanvasView.h"
-#include "GUI/Widget.h"
+#include "Common/GUI/Widget.h"
 #include "Math.h"
 
 namespace gui

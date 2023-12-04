@@ -10,10 +10,10 @@
  *
  */
 
-#ifndef __GUI_WIDGET_H
-#define __GUI_WIDGET_H
+#ifndef __COMMON_WIDGET_H
+#define __COMMON_WIDGET_H
 
-#include "Plug/Widget.h"
+#include "Common/Plug/Widget.h"
 
 namespace gui
 {

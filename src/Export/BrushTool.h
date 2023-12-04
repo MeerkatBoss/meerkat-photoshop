@@ -12,9 +12,10 @@
 #ifndef __TOOL_BRUSH_TOOL_H
 #define __TOOL_BRUSH_TOOL_H
 
-#include "Math.h"
-#include "Plug/Tool.h"
-#include "Tool/BaseTool.h"
+#include "Common/BaseTool.h"
+#include "Common/Math.h"
+
+extern "C" plug::Plugin* loadPlugin(void);
 
 class BrushTool : public BaseTool
 {
@@ -27,7 +28,7 @@ public:
   {
   }
 
-  virtual ~BrushTool() override{}
+  virtual ~BrushTool() override {}
 
   virtual void onMove(const Vec2d& position) override;
 

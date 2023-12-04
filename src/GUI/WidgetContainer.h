@@ -13,7 +13,7 @@
 #define __GUI_WIDGET_CONTAINER_H
 
 #include "DynArray.h"
-#include "GUI/Widget.h"
+#include "Common/GUI/Widget.h"
 #include "Math.h"
 
 namespace gui

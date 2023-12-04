@@ -1,14 +1,19 @@
 PROJECT	:= window_manager
 VERSION := 0.0.1
 
-SRCDIR	:= src
-TESTDIR := tests
-LIBDIR	:= lib
-INCDIR	:= include
+SRCDIR	  := src
+TESTDIR   := tests
+LIBDIR	  := lib
+INCDIR	  := include
+EXPORTDIR := $(SRCDIR)/Export
+COMMONDIR := $(SRCDIR)/Common
 
 BUILDDIR:= build
 OBJDIR 	:= $(BUILDDIR)/obj
 BINDIR	:= $(BUILDDIR)/bin
+EXPORTOBJDIR := $(OBJDIR)/Export
+EXPORTBINDIR := $(BINDIR)/Export
+COMMONOBJDIR := $(OBJDIR)/Common
 
 SRCEXT	:= cpp
 HEADEXT	:= h
@@ -35,13 +40,12 @@ CDEBUG:=-D _DEBUG -ggdb3 -fcheck-new -fsized-deallocation -fstack-protector\
 
 CMACHINE:=-mavx512f -march=native -mtune=native
 
-CFLAGS:=-std=c++17 -fPIE $(CMACHINE) $(CWARN)
-INCFLAGS:= -I$(SRCDIR) -I$(INCDIR)
-LFLAGS  := -Llib/ $(addprefix -l, $(LIBS))\
-			-lsfml-graphics -lsfml-window -lsfml-system
+CFLAGS:=-std=c++17 -fPIE -fPIC $(CMACHINE) $(CWARN) -DSFML_STATIC
+INCFLAGS:= -I$(SRCDIR) -I$(INCDIR) -I$(COMMONDIR)
+LFLAGS  := -lsfml-graphics -lsfml-window -lsfml-system -ldl
 
 ifeq ($(BUILDTYPE), Release)
-	CFLAGS:=-O3 $(CFLAGS)
+	CFLAGS:=-O2 -DNASSERT $(CFLAGS)
 else
 	CFLAGS:=-O0 $(CDEBUG) $(CFLAGS)
 endif
@@ -56,14 +60,20 @@ TIDYFLAGS :=--checks=$(TIDYCHECKS) --header-filter="" --quiet\
 
 TIDYFLAGS +=$(foreach flag, $(CFLAGS),--extra-arg=$(flag))
 
-HEADERS := $(shell find -L $(SRCDIR) -type f -name "*.$(HEADEXT)")
-SOURCES := $(shell find -L $(SRCDIR) -type f -name "*.$(SRCEXT)")
+SOURCES := $(shell find -L $(SRCDIR) -type f -name "*.$(SRCEXT)" -not -path "$(EXPORTDIR)/*")
+EXPORTS := $(shell find $(EXPORTDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS	:= $(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
-TESTS	:= $(shell find $(TESTDIR) -type f -name "*$(SRCEXT)")
-TESTOBJS:= $(patsubst %,$(OBJDIR)/%,$(TESTS:.$(SRCEXT)=.$(OBJEXT)))
-LIBS	:= $(patsubst lib%.a, %, $(shell find $(LIBDIR) -type f))
+COMMONOBJS := $(filter $(COMMONOBJDIR)/%,$(OBJECTS))
+EXPORTOBJS := $(patsubst $(EXPORTDIR)/%,$(EXPORTOBJDIR)/%,$(EXPORTS:.$(SRCEXT)=.$(OBJEXT)))
+EXPORTBINS := $(patsubst $(EXPORTDIR)/%,$(EXPORTBINDIR)/%,$(EXPORTS:.$(SRCEXT)=.so))
+MAINSRC := src/Main.cpp
+MAINOBJ := obj/Main.o
 
-all: $(BINDIR)/$(PROJECT)
+all: export $(BINDIR)/$(PROJECT)
+
+export: $(EXPORTBINS)
+	@$(foreach bin,$<,mkdir -p Plugins/$(basename $(notdir $(bin)))/;)
+	@$(foreach bin,$<,cp -f -t Plugins/$(basename $(notdir $(bin)))/ $(bin);)
 
 remake: cleaner all
 
@@ -73,39 +83,26 @@ init:
 	@mkdir -p $(LIBDIR)
 	@mkdir -p $(OBJDIR)
 	@mkdir -p $(BINDIR)
-
-build_lib: $(OBJECTS)
-	@mkdir -p dist/include
-	@mkdir -p dist/lib
-	@ar rcs dist/lib/lib$(PROJECT).a $^
-	@find $(SRCDIR) -type f -name *.$(HEADEXT) -exec\
-		bash -c 'cp -p --parents {} dist/include' \;
-	@tar -czf dist/$(PROJECT)-$(VERSION)-linux-x86_64.tar.gz dist/*
-	@rm -r dist/include
-	@rm -r dist/lib
-
-# Build test objects
-$(OBJDIR)/$(TESTDIR)/%.$(OBJEXT): $(TESTDIR)/%.$(SRCEXT)
-	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $(INCFLAGS) -I$(TESTDIR) -c $< -o $@
+	@mkdir -p $(TESTDIR)
 
 # Build source objects
 $(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
-	@echo Building $@ "... "
+	@echo Building $@
 	@$(CTIDY) $(TIDYFLAGS) $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(if $(filter $<,$(TRACED)),,-DNLOG_TRACE)\
 		$(CFLAGS) $(INCFLAGS) -c $< -o $@
 
+# Build plugin binaries
+$(EXPORTBINDIR)/%.so: $(EXPORTOBJDIR)/%.$(OBJEXT) $(COMMONOBJS)
+	@echo Building plugin $(basename $(notdir $@))
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -shared $^ -o $@
+
 # Build project binary
 $(BINDIR)/$(PROJECT): $(OBJECTS)
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $^ $(LFLAGS) -o $(BINDIR)/$(PROJECT)
-
-# Build test binary
-$(BINDIR)/$(PROJECT)_tests: $(filter-out %/main.o,$(OBJECTS)) $(TESTOBJS)
-	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $^ $(LFLAGS) -o $(BINDIR)/$(PROJECT)_tests
 
 format:
 	@$(foreach source, $(shell find $(SRCDIR) -type f,\
@@ -120,8 +117,5 @@ cleaner: clean
 run: $(BINDIR)/$(PROJECT)
 	$(BINDIR)/$(PROJECT) $(ARGS)
 
-test: $(BINDIR)/$(PROJECT)_tests
-	 $(BINDIR)/$(PROJECT)_tests $(ARGS)
-
-.PHONY: all remake clean cleaner
+.PHONY: all remake clean cleaner run format
 

@@ -1,8 +1,28 @@
-#include "Tool/BrushTool.h"
+#include "Export/BrushTool.h"
 
 #include <cassert>
 #include <cstdio>
-#include "Tool/BaseTool.h"
+
+#include "Common/mklog/writers/TextLogWriter.h"
+
+extern "C" plug::Plugin* loadPlugin(void)
+{
+#ifndef NLOGS
+  auto& log_writer = mklog::LogManager::addWriter<mklog::TextLogWriter>()
+    .setFile("Plugins/BrushTool/_log.txt");
+  if (!log_writer.valid())
+  {
+    log_writer.setFile("_meerkat_brush_tool_log.txt");
+  }
+
+  if (log_writer.valid())
+  {
+    mklog::LogManager::initLogs();
+  }
+#endif // NLOGS
+
+  return new BrushTool(10);
+}
 
 void BrushTool::onMove(const Vec2d& position)
 {

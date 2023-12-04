@@ -13,7 +13,8 @@
 #define __EDITOR_STATE_H
 
 #include "Canvas/Canvas.h"
-#include "DynArray.h"
+#include "Common/DynArray.h"
+#include "LogHelpers.h"
 #include "Tool/ColorPalette.h"
 #include "Tool/ToolPalette.h"
 
@@ -36,6 +37,8 @@ public:
       delete m_canvases[i];
     }
   }
+
+  void loadPlugins(const char* plugdir);
 
   void saveActiveCanvas(void)
   {
@@ -68,6 +71,10 @@ public:
   void openCanvas(const char* filename);
 
 private:
+  static Logger s_logger;
+
+  plug::Plugin* getPluginFromDir(const char* dirpath);
+
   void saveCanvas(const Canvas* canvas);
 
   Canvas*           m_activeCanvas;

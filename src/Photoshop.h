@@ -17,7 +17,7 @@
 #include "Canvas/Canvas.h"
 #include "EditorState.h"
 #include "LogHelpers.h"
-#include "Plug/Widget.h"
+#include "Common/Plug/Widget.h"
 
 class Photoshop
 {
@@ -26,6 +26,8 @@ public:
   ~Photoshop(void);
 
   void initGUI(void);
+
+  void loadPlugins(const char* plugdir) { m_editorState.loadPlugins(plugdir); }
 
   void runMainLoop(void);
 

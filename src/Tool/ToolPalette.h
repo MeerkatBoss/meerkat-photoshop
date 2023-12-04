@@ -15,7 +15,7 @@
 #include <cassert>
 
 #include "DynArray.h"
-#include "Plug/Tool.h"
+#include "Common/Plug/Tool.h"
 #include "Tool/ColorPalette.h"
 
 class ToolPalette
@@ -30,7 +30,7 @@ public:
   {
     for (size_t i = 0; i < m_tools.getSize(); ++i)
     {
-      delete m_tools[i];
+      m_tools[i]->release();
     }
   }
 
