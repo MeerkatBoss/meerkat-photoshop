@@ -1,4 +1,4 @@
-#include "Tool/BrushTool.h"
+#include "Export/BrushTool.h"
 
 #include <cassert>
 #include <cstdio>

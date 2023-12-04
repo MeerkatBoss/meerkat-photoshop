@@ -15,7 +15,7 @@
 #include "Impl/RenderTarget/SfmlRenderTarget/RenderTarget.h"
 #include "Impl/TransformStack.h"
 #include "LogHelpers.h"
-#include "Tool/BrushTool.h"
+// #include "Tool/BrushTool.h"
 
 Logger Photoshop::s_logger = Logger("Photoshop");
 
@@ -46,7 +46,7 @@ Photoshop::Photoshop(size_t width, size_t height) :
   s_logger.LOG_INFO(ContentType::TEXT, "Opened Photoshop window %zux%zu", width,
                     height);
 
-  m_editorState.getTools().addTool(new BrushTool(10));
+  // m_editorState.getTools().addTool(new BrushTool(10));
   m_editorState.newCanvas("Untitled.png", 1000, 1000);
 
   s_logger.LOG_TRACE(ContentType::TEXT, "Created Photoshop instance");
