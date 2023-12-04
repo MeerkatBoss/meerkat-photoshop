@@ -57,7 +57,7 @@ plug::Plugin* EditorState::getPluginFromDir(const char* dirpath)
       return nullptr;
     }
 
-    strncpy(FULLPATH, dirpath, base_len);
+    strncpy(FULLPATH, dirpath, MAX_PATH);
     strncat(FULLPATH, child->d_name, filename_len);
 
     s_logger.LOG_TRACE(Content::TEXT, "Found plugin object '%s'", FULLPATH);
@@ -155,6 +155,15 @@ void EditorState::loadPlugins(const char* dirpath)
       s_logger.LOG_INFO(Content::TEXT, "Loaded tool '%s'",
           tool->getPluginData()->getName());
       m_tools.addTool(tool);
+    }
+
+    plug::Filter* filter = static_cast<plug::Filter*>(
+        plugin->tryGetInterface(size_t(plug::PluginGuid::Filter)));
+    if (filter != nullptr)
+    {
+      s_logger.LOG_INFO(Content::TEXT, "Loaded filter '%s'",
+          filter->getPluginData()->getName());
+      m_filters.addFilter(filter);
     }
 
     plugin->release();

@@ -1,7 +1,6 @@
-#include "LogHelpers.h"
-#undef NLOG_TRACE
-
 #include "Filter/FilterPalette.h"
+
+#include "LogHelpers.h"
 
 Logger FilterPalette::s_logger = Logger("Filter Palette");
 
@@ -17,6 +16,7 @@ FilterPalette::~FilterPalette(void)
   {
     s_logger.LOG_TRACE(Content::TEXT, "Releasing filter '%s'",
                        m_filters[i]->getPluginData()->getName());
+    m_filters[i]->release();
   }
   s_logger.LOG_DEBUG(Content::TEXT, "Destroyed FilterPalette at %p", this);
 }

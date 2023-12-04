@@ -7,14 +7,14 @@ Logger BaseFilter::s_logger = Logger("Filter");
 BaseFilter::BaseFilter(const char* name, const char* icon_path) :
     m_filterId(++s_idCounter), m_data(name, icon_path), m_refCount(1)
 {
-  s_logger.LOG_TRACE(Content::TEXT,
+  s_logger.LOG_DEBUG(Content::TEXT,
                      "Created filter \"%s\" (id %zu) with texture path \"%s\"",
                      name, m_filterId, icon_path);
 }
 
 BaseFilter::~BaseFilter()
 {
-  s_logger.LOG_TRACE(Content::TEXT, "Destroyed filter \"%s\" (id %zu)",
+  s_logger.LOG_DEBUG(Content::TEXT, "Destroyed filter \"%s\" (id %zu)",
                      m_data.getName(), m_filterId);
 }
 
@@ -55,7 +55,7 @@ plug::Plugin* BaseFilter::tryGetInterface(size_t interface_id)
 void BaseFilter::addReference(void)
 {
   ++m_refCount;
-  s_logger.LOG_TRACE(Content::TEXT,
+  s_logger.LOG_DEBUG(Content::TEXT,
                      "Added reference to filter \"%s\" (id %zu), refCount=%zu",
                      m_data.getName(), m_filterId, m_refCount);
 }
@@ -68,7 +68,7 @@ void BaseFilter::release(void)
       m_data.getName(), m_filterId);
 
   --m_refCount;
-  s_logger.LOG_TRACE(
+  s_logger.LOG_DEBUG(
       Content::TEXT,
       "Released reference to filter \"%s\" (id %zu), refCount=%zu",
       m_data.getName(), m_filterId, m_refCount);
