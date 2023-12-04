@@ -1,6 +1,6 @@
-#include "Tool/BaseTool.h"
+#include "Common/BaseTool.h"
 
-#include "LogHelpers.h"
+#include "Common/LogHelpers.h"
 
 size_t BaseTool::s_idCounter = 0;
 

@@ -12,9 +12,8 @@
 #ifndef __TOOL_BRUSH_TOOL_H
 #define __TOOL_BRUSH_TOOL_H
 
-#include "Math.h"
-#include "Plug/Tool.h"
-#include "Tool/BaseTool.h"
+#include "Common/Math.h"
+#include "Common/BaseTool.h"
 
 class BrushTool : public BaseTool
 {

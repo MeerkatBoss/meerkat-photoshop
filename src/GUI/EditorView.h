@@ -16,8 +16,7 @@
 #include "EditorState.h"
 #include "GUI/CanvasView.h"
 #include "GUI/ToolSelector.h"
-#include "GUI/Widget.h"
-#include "GUI/WidgetContainer.h"
+#include "Common/GUI/Widget.h"
 
 namespace gui
 {

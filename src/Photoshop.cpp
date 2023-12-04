@@ -8,7 +8,7 @@
 #include "GUI/CanvasView.h"
 #include "GUI/EditorView.h"
 #include "GUI/ToolSelector.h"
-#include "GUI/Widget.h"
+#include "Common/GUI/Widget.h"
 #include "GUI/WidgetContainer.h"
 #include "Impl/EventManager/SfmlEventManager.h"
 #include "Impl/LayoutBox/LayoutBox.h"

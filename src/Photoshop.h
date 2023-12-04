@@ -17,7 +17,7 @@
 #include "Canvas/Canvas.h"
 #include "EditorState.h"
 #include "LogHelpers.h"
-#include "Plug/Widget.h"
+#include "Common/Plug/Widget.h"
 
 class Photoshop
 {

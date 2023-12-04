@@ -12,7 +12,7 @@
 #ifndef __GUI_BUTTON_H
 #define __GUI_BUTTON_H
 
-#include "GUI/Widget.h"
+#include "Common/GUI/Widget.h"
 
 namespace gui
 {

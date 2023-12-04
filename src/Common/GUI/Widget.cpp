@@ -1,7 +1,7 @@
-#include "GUI/Widget.h"
+#include "Common/GUI/Widget.h"
 
-#include "Plug/Color.h"
-#include "Plug/Math/Vec2d.h"
+#include "Common/Plug/Color.h"
+#include "Common/Plug/Math/Vec2d.h"
 
 namespace gui
 {

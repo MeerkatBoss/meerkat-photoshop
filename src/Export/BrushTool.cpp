@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <cstdio>
-#include "Tool/BaseTool.h"
 
 void BrushTool::onMove(const Vec2d& position)
 {

@@ -6,12 +6,14 @@ TESTDIR   := tests
 LIBDIR	  := lib
 INCDIR	  := include
 EXPORTDIR := $(SRCDIR)/Export
+COMMONDIR := $(SRCDIR)/Common
 
 BUILDDIR:= build
 OBJDIR 	:= $(BUILDDIR)/obj
 BINDIR	:= $(BUILDDIR)/bin
 EXPORTOBJDIR := $(OBJDIR)/Export
 EXPORTBINDIR := $(BINDIR)/Export
+COMMONOBJDIR := $(OBJDIR)/Common
 
 SRCEXT	:= cpp
 HEADEXT	:= h
@@ -39,8 +41,8 @@ CDEBUG:=-D _DEBUG -ggdb3 -fcheck-new -fsized-deallocation -fstack-protector\
 CMACHINE:=-mavx512f -march=native -mtune=native
 
 CFLAGS:=-std=c++17 -fPIE -fPIC $(CMACHINE) $(CWARN) -DSFML_STATIC
-INCFLAGS:= -I$(SRCDIR) -I$(INCDIR)
-LFLAGS  := -lsfml-graphics-s -lsfml-window-s -lsfml-system-s
+INCFLAGS:= -I$(SRCDIR) -I$(INCDIR) -I$(COMMONDIR)
+LFLAGS  := -lsfml-graphics -lsfml-window -lsfml-system
 
 ifeq ($(BUILDTYPE), Release)
 	CFLAGS:=-O3 $(CFLAGS)
@@ -61,12 +63,15 @@ TIDYFLAGS +=$(foreach flag, $(CFLAGS),--extra-arg=$(flag))
 SOURCES := $(shell find -L $(SRCDIR) -type f -name "*.$(SRCEXT)" -not -path "$(EXPORTDIR)/*")
 EXPORTS := $(shell find $(EXPORTDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS	:= $(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
+COMMONOBJS := $(filter $(COMMONOBJDIR)/%,$(OBJECTS))
 EXPORTOBJS := $(patsubst $(EXPORTDIR)/%,$(EXPORTOBJDIR)/%,$(EXPORTS:.$(SRCEXT)=.$(OBJEXT)))
 EXPORTBINS := $(patsubst $(EXPORTDIR)/%,$(EXPORTBINDIR)/%,$(EXPORTS:.$(SRCEXT)=.so))
 MAINSRC := src/Main.cpp
 MAINOBJ := obj/Main.o
 
 all: $(BINDIR)/$(PROJECT) $(EXPORTBINS)
+
+export: $(EXPORTBINS)
 
 remake: cleaner all
 
@@ -87,10 +92,10 @@ $(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 		$(CFLAGS) $(INCFLAGS) -c $< -o $@
 
 # Build plugin binaries
-$(EXPORTBINDIR)/%.so: $(EXPORTOBJDIR)/%.$(OBJEXT) $(filter-out $(MAINOBJ),$(OBJECTS))
+$(EXPORTBINDIR)/%.so: $(EXPORTOBJDIR)/%.$(OBJEXT) $(COMMONOBJS)
 	@echo Building plugin $@ "... "
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -shared $^ -Bstatic $(LFLAGS) -o $@
+	@$(CC) $(CFLAGS) -shared $^ -o $@
 
 # Build project binary
 $(BINDIR)/$(PROJECT): $(OBJECTS)

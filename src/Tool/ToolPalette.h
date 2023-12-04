@@ -15,7 +15,7 @@
 #include <cassert>
 
 #include "DynArray.h"
-#include "Plug/Tool.h"
+#include "Common/Plug/Tool.h"
 #include "Tool/ColorPalette.h"
 
 class ToolPalette

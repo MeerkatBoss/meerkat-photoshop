@@ -13,7 +13,7 @@
 #define __GUI_CANVAS_VIEW_H
 
 #include "Canvas/Canvas.h"
-#include "GUI/Widget.h"
+#include "Common/GUI/Widget.h"
 #include "Tool/ToolPalette.h"
 
 namespace gui

@@ -12,7 +12,7 @@
 #ifndef __TOOL_COLOR_PALETTE_H
 #define __TOOL_COLOR_PALETTE_H
 
-#include "Plug/Tool/ColorPalette.h"
+#include "Common/Plug/Tool/ColorPalette.h"
 
 class ColorPalette : public plug::ColorPalette
 {

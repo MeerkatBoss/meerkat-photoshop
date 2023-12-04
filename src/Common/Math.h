@@ -12,7 +12,7 @@
 #ifndef __MATH_H
 #define __MATH_H
 
-#include "Plug/Math.h"
+#include "Common/Plug/Math.h"
 using plug::Vec2d;
 using plug::Transform;
 using plug::dot;

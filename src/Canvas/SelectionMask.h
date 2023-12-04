@@ -14,7 +14,7 @@
 
 #include <cassert>
 
-#include "Plug/Canvas/SelectionMask.h"
+#include "Common/Plug/Canvas/SelectionMask.h"
 
 class SelectionMask : public plug::SelectionMask
 {
