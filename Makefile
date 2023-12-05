@@ -38,7 +38,7 @@ CDEBUG:=-D _DEBUG -ggdb3 -fcheck-new -fsized-deallocation -fstack-protector\
 }null,return,returns-nonnull-attribute,shift,${strip \
 }signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 
-CMACHINE:=-mavx512f -march=native -mtune=native
+CMACHINE:= # -mavx512f -march=native -mtune=native
 
 CFLAGS:=-std=c++17 -fPIE -fPIC $(CMACHINE) $(CWARN) -DSFML_STATIC
 INCFLAGS:= -I$(SRCDIR) -I$(INCDIR) -I$(COMMONDIR)
@@ -72,8 +72,8 @@ MAINOBJ := obj/Main.o
 all: export $(BINDIR)/$(PROJECT)
 
 export: $(EXPORTBINS)
-	@$(foreach bin,$<,mkdir -p Plugins/$(basename $(notdir $(bin)))/;)
-	@$(foreach bin,$<,cp -f -t Plugins/$(basename $(notdir $(bin)))/ $(bin);)
+	@$(foreach bin,$^,mkdir -p Plugins/$(basename $(notdir $(bin)))/;)
+	@$(foreach bin,$^,cp -f -t Plugins/$(basename $(notdir $(bin)))/ $(bin);)
 
 remake: cleaner all
 

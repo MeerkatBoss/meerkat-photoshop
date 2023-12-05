@@ -8,8 +8,35 @@
 #include "Canvas/SelectionMask.h"
 #include "Impl/RenderTarget/SfmlRenderTarget/RenderTarget.h"
 
+Logger Canvas::s_logger = Logger("Canvas");
+
+Canvas::Canvas(const char* name, size_t width, size_t height) :
+    m_cacheState(Valid),
+    m_name(name),
+    m_width(width),
+    m_height(height),
+    m_mask(width, height),
+    m_rawTexture(new plug::Texture(width, height))
+{
+  m_renderTexture.create(width, height);
+  m_renderTexture.clear(sf::Color::White);
+  s_logger.LOG_DEBUG(Content::TEXT, "Created canvas '%s' %zux%zu at %p", name,
+                     width, height, this);
+}
+
+Canvas::~Canvas(void)
+{
+  delete m_rawTexture;
+  s_logger.LOG_DEBUG(Content::TEXT, "Destroyed canvas '%s' %zux%zu at %p",
+                     m_name, m_width, m_height, this);
+}
+
 void Canvas::draw(const plug::VertexArray& vertex_array)
 {
+  s_logger.LOG_TRACE(Content::TEXT,
+                     "Drawing plain vertex array on canvas '%s' at %p", m_name,
+                     this);
+
   if (m_cacheState == InvalidRenderTexture)
   {
     copyRawToRender();
@@ -23,6 +50,10 @@ void Canvas::draw(const plug::VertexArray& vertex_array)
 void Canvas::draw(const plug::VertexArray& vertex_array,
                   const plug::Texture&     texture)
 {
+  s_logger.LOG_TRACE(Content::TEXT,
+                     "Drawing textured vertex array on canvas '%s' at %p",
+                     m_name, this);
+
   if (m_cacheState == InvalidRenderTexture)
   {
     copyRawToRender();
@@ -39,6 +70,10 @@ void Canvas::setSize(const plug::Vec2d& size)
   {
     copyRawToRender();
   }
+  s_logger.LOG_DEBUG(
+      Content::TEXT, "Resized canvas '%s' at %p from (%zu, %zu) to (%zu, %zu)",
+      m_name, this, m_width, m_height, size_t(size.x), size_t(size.y));
+
   const size_t new_width(size.x);
   const size_t new_height(size.y);
 
@@ -46,6 +81,7 @@ void Canvas::setSize(const plug::Vec2d& size)
   sf::Texture texture = m_renderTexture.getTexture();
   sf::Sprite  sprite(texture);
   m_renderTexture.create(new_width, new_height);
+  m_renderTexture.clear(sf::Color::White);
   m_renderTexture.draw(sprite);
 
   /* Resize raw texture, but discard data */
@@ -78,6 +114,9 @@ void Canvas::copyRenderToRaw(void) const
     return;
   }
 
+  s_logger.LOG_DEBUG(Content::TEXT, "Updating raw cache in canvas '%s' at %p",
+                     m_name, this);
+
   const_cast<Canvas*>(this)->m_renderTexture.display();
   sf::Image image = m_renderTexture.getTexture().copyToImage();
   for (size_t x = 0; x < m_width; ++x)
@@ -96,6 +135,9 @@ void Canvas::copyRawToRender(void) const
   {
     return;
   }
+  s_logger.LOG_DEBUG(Content::TEXT,
+                     "Updating render cache in canvas '%s' at %p", m_name,
+                     this);
 
   sf::Texture texture;
   texture.create(m_width, m_height);

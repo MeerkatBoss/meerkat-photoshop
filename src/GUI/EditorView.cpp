@@ -1,7 +1,7 @@
 #include "GUI/EditorView.h"
 
-#include "GUI/CanvasView.h"
 #include "Common/GUI/Widget.h"
+#include "GUI/CanvasView.h"
 #include "Math.h"
 
 namespace gui
@@ -99,6 +99,26 @@ void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
   for (size_t i = 0; i < view_count; ++i)
   {
     m_views[i]->onParentUpdate(getLayoutBox());
+  }
+}
+
+void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
+                                   plug::EHC&                        context)
+{
+  /* TODO: Allow creating and opening canvases with hotkeys and menus */
+
+  if (context.stopped)
+  {
+    return;
+  }
+
+  if (event.ctrl && event.key_id == plug::KeyCode::F)
+  {
+    plug::Canvas* active_canvas = m_editorState.getActiveCanvas();
+    if (active_canvas != nullptr && m_editorState.getFilters().hasLastFilter())
+    {
+      m_editorState.getFilters().getLastFilter().applyFilter(*active_canvas);
+    }
   }
 }
 } // namespace gui
