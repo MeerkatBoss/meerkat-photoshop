@@ -62,6 +62,8 @@ void EditorView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 
   m_toolSelector.draw(stack, target);
 
+  m_filterSelector.draw(stack, target);
+
   stack.leave();
 }
 
@@ -70,6 +72,8 @@ void EditorView::onEvent(const plug::Event& event, plug::EHC& context)
   Widget::onEvent(event, context);
 
   context.stack.enter(Transform(getLayoutBox().getPosition()));
+
+  m_filterSelector.onEvent(event, context);
 
   m_toolSelector.onEvent(event, context);
 
@@ -93,6 +97,7 @@ void EditorView::onEvent(const plug::Event& event, plug::EHC& context)
 void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
 {
   getLayoutBox().onParentUpdate(parent_box);
+  m_filterSelector.onParentUpdate(getLayoutBox());
   m_toolSelector.onParentUpdate(getLayoutBox());
 
   const size_t view_count = m_views.getSize();

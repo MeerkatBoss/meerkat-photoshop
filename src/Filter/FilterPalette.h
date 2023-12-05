@@ -27,13 +27,13 @@ public:
 
   size_t getFilterCount(void) const;
 
-  const plug::Filter& getFilter(size_t filter_idx) const;
+  plug::Filter& getFilter(size_t filter_idx) const;
 
   void setLastFilter(size_t filter_idx);
 
   bool hasLastFilter(void) const;
   
-  const plug::Filter& getLastFilter(void) const;
+  plug::Filter& getLastFilter(void) const;
 
 private:
   static Logger s_logger;

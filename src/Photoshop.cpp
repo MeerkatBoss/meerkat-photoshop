@@ -3,12 +3,12 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 
+#include "Common/GUI/Widget.h"
 #include "EditorState.h"
 #include "GUI/Button.h"
 #include "GUI/CanvasView.h"
 #include "GUI/EditorView.h"
 #include "GUI/ToolSelector.h"
-#include "Common/GUI/Widget.h"
 #include "GUI/WidgetContainer.h"
 #include "Impl/EventManager/SfmlEventManager.h"
 #include "Impl/LayoutBox/LayoutBox.h"
@@ -99,7 +99,12 @@ void Photoshop::runMainLoop(void)
   SfmlRenderTarget wrapped_rt(m_window);
 
   /* TODO: remove stub */
-  m_editorState.getFilters().setLastFilter(0);
+  m_editorState.getFilters().setLastFilter(
+      m_editorState.getFilters().getFilterCount() - 1);
+
+  /* TODO: remove stub */
+  m_editorState.getTools().setActiveTool(
+      m_editorState.getTools().getToolCount() - 1);
 
   s_logger.LOG_TRACE(ContentType::TEXT, "Entering Photoshop main loop");
   while (m_window.isOpen())

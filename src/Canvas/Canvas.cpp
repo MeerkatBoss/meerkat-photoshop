@@ -114,7 +114,7 @@ void Canvas::copyRenderToRaw(void) const
     return;
   }
 
-  s_logger.LOG_DEBUG(Content::TEXT, "Updating raw cache in canvas '%s' at %p",
+  s_logger.LOG_TRACE(Content::TEXT, "Updating raw cache in canvas '%s' at %p",
                      m_name, this);
 
   const_cast<Canvas*>(this)->m_renderTexture.display();
@@ -135,7 +135,7 @@ void Canvas::copyRawToRender(void) const
   {
     return;
   }
-  s_logger.LOG_DEBUG(Content::TEXT,
+  s_logger.LOG_TRACE(Content::TEXT,
                      "Updating render cache in canvas '%s' at %p", m_name,
                      this);
 

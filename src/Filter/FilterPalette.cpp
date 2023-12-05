@@ -37,7 +37,7 @@ size_t FilterPalette::getFilterCount(void) const
   return m_filters.getSize();
 }
 
-const plug::Filter& FilterPalette::getFilter(size_t filter_idx) const
+plug::Filter& FilterPalette::getFilter(size_t filter_idx) const
 {
   s_logger.LOG_TRACE(Content::TEXT,
                      "Requested filter %zu/%zu from filter palette %p",
@@ -77,7 +77,7 @@ bool FilterPalette::hasLastFilter(void) const
   }
 }
 
-const plug::Filter& FilterPalette::getLastFilter(void) const
+plug::Filter& FilterPalette::getLastFilter(void) const
 {
   LOG_ASSERT(s_logger, m_lastFilter != nullptr,
              "Filter palette %p has no last filter", this);

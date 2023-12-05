@@ -167,8 +167,6 @@ void EditorState::loadPlugins(const char* dirpath)
     }
 
     plugin->release();
-
-    // TODO: load filters
   }
   closedir(plugdir);
 }
