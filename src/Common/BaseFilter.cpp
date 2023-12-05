@@ -67,12 +67,16 @@ void BaseFilter::release(void)
       "Attempted release with zero reference count for filter \"%s\" (id %zu)",
       m_data.getName(), m_filterId);
 
+  if (m_refCount == 0)
+  {
+    return;
+  }
+
   --m_refCount;
   s_logger.LOG_DEBUG(
       Content::TEXT,
       "Released reference to filter \"%s\" (id %zu), refCount=%zu",
-      m_data.getName(), m_filterId, m_refCount);
-  if (m_refCount == 0)
+      m_data.getName(), m_filterId, m_refCount); if (m_refCount == 0)
   {
     s_logger.LOG_TRACE(
         Content::TEXT,

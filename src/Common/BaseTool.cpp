@@ -13,14 +13,14 @@ BaseTool::BaseTool(const char* name, const char* icon_path) :
     m_colors(nullptr),
     m_canvas(nullptr)
 {
-  s_logger.LOG_TRACE(Content::TEXT,
+  s_logger.LOG_DEBUG(Content::TEXT,
                      "Created tool \"%s\" (id %zu) with texture path \"%s\"",
                      name, m_toolId, icon_path);
 }
 
 BaseTool::~BaseTool()
 {
-  s_logger.LOG_TRACE(Content::TEXT, "Destroyed tool \"%s\" (id %zu)",
+  s_logger.LOG_DEBUG(Content::TEXT, "Destroyed tool \"%s\" (id %zu)",
                      m_data.getName(), m_toolId);
 }
 
@@ -61,7 +61,7 @@ plug::Plugin* BaseTool::tryGetInterface(size_t interface_id)
 void BaseTool::addReference(void)
 {
   ++m_refCount;
-  s_logger.LOG_TRACE(Content::TEXT,
+  s_logger.LOG_DEBUG(Content::TEXT,
                      "Added reference to tool \"%s\" (id %zu), refCount=%zu",
                      m_data.getName(), m_toolId, m_refCount);
 }
@@ -73,8 +73,13 @@ void BaseTool::release(void)
       "Attempted release with zero reference count for tool \"%s\" (id %zu)",
       m_data.getName(), m_toolId);
 
+  if (m_refCount == 0)
+  {
+    return;
+  }
+
   --m_refCount;
-  s_logger.LOG_TRACE(Content::TEXT,
+  s_logger.LOG_DEBUG(Content::TEXT,
                      "Released reference to tool \"%s\" (id %zu), refCount=%zu",
                      m_data.getName(), m_toolId, m_refCount);
   if (m_refCount == 0)
