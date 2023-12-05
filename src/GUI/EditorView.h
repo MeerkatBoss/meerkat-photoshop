@@ -12,11 +12,12 @@
 #ifndef __GUI_EDITOR_VIEW_H
 #define __GUI_EDITOR_VIEW_H
 
+#include "Common/GUI/Widget.h"
 #include "DynArray.h"
 #include "EditorState.h"
 #include "GUI/CanvasView.h"
+#include "GUI/FilterSelector.h"
 #include "GUI/ToolSelector.h"
-#include "Common/GUI/Widget.h"
 
 namespace gui
 {
@@ -27,6 +28,7 @@ public:
   EditorView(EditorState& editor_state, const plug::LayoutBox& layout_box) :
       Widget(layout_box),
       m_editorState(editor_state),
+      m_filterSelector(editor_state.getFilters()),
       m_toolSelector(editor_state.getTools()),
       m_views(),
       m_activeView(nullptr)
@@ -52,11 +54,16 @@ public:
 
   void onParentUpdate(const plug::LayoutBox& parent_box) override;
 
-  /* TODO: Allow creating and opening canvases with hotkeys and menus */ 
+protected:
+  /* TODO: Allow creating and opening canvases with hotkeys and menus */
+
+  virtual void onKeyboardPressed(const plug::KeyboardPressedEvent& event,
+                                 plug::EHC& context) override;
 
 private:
   EditorState& m_editorState;
 
+  FilterSelector        m_filterSelector;
   ToolSelector          m_toolSelector;
   DynArray<CanvasView*> m_views;
   CanvasView*           m_activeView;

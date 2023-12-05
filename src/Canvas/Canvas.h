@@ -17,25 +17,14 @@
 
 #include "Canvas/SelectionMask.h"
 #include "Common/Plug/Canvas/Canvas.h"
+#include "LogHelpers.h"
 
 class Canvas : public plug::Canvas
 {
 public:
-  Canvas(const char* name, size_t width, size_t height) :
-      m_cacheState(Valid),
-      m_name(name),
-      m_width(width),
-      m_height(height),
-      m_mask(width, height),
-      m_rawTexture(new plug::Texture(width, height))
-  {
-    m_renderTexture.create(width, height);
-  }
+  Canvas(const char* name, size_t width, size_t height);
 
-  virtual ~Canvas(void) override
-  {
-    delete m_rawTexture;
-  }
+  virtual ~Canvas(void) override;
 
   virtual void draw(const plug::VertexArray& vertex_array) override;
 
@@ -91,6 +80,8 @@ public:
   const char* getName(void) const { return m_name; }
 
 private:
+  static Logger s_logger;
+
   void copyRenderToRaw(void) const;
   void copyRawToRender(void) const;
 

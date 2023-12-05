@@ -98,6 +98,9 @@ void Photoshop::runMainLoop(void)
   SfmlEventManager event_manager(m_window, stack);
   SfmlRenderTarget wrapped_rt(m_window);
 
+  /* TODO: remove stub */
+  m_editorState.getFilters().setLastFilter(0);
+
   s_logger.LOG_TRACE(ContentType::TEXT, "Entering Photoshop main loop");
   while (m_window.isOpen())
   {

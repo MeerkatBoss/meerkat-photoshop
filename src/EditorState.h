@@ -14,6 +14,7 @@
 
 #include "Canvas/Canvas.h"
 #include "Common/DynArray.h"
+#include "Filter/FilterPalette.h"
 #include "LogHelpers.h"
 #include "Tool/ColorPalette.h"
 #include "Tool/ToolPalette.h"
@@ -57,6 +58,8 @@ public:
 
   void setActiveCanvas(Canvas* canvas);
 
+  FilterPalette& getFilters(void) { return m_filters; }
+
   ToolPalette& getTools(void) { return m_tools; }
 
   ColorPalette& getColors(void) { return m_colors; }
@@ -79,6 +82,7 @@ private:
 
   Canvas*           m_activeCanvas;
   DynArray<Canvas*> m_canvases;
+  FilterPalette     m_filters;
   ToolPalette       m_tools;
   ColorPalette      m_colors;
 };

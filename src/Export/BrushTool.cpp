@@ -26,8 +26,7 @@ extern "C" plug::Plugin* loadPlugin(void)
 
 void BrushTool::onMove(const Vec2d& position)
 {
-  BaseTool::onMove(position);
-
+  BaseTool::onMove(position); 
   if (m_isDrawing)
   {
     drawLine(m_lastPos, position);
