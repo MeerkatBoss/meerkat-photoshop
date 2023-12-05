@@ -11,11 +11,11 @@
 #include "GUI/ToolSelector.h"
 #include "GUI/WidgetContainer.h"
 #include "Impl/EventManager/SfmlEventManager.h"
-#include "Impl/LayoutBox/LayoutBox.h"
 #include "Impl/RenderTarget/SfmlRenderTarget/RenderTarget.h"
 #include "Impl/TransformStack.h"
 #include "LogHelpers.h"
-// #include "Tool/BrushTool.h"
+
+using namespace layout;
 
 Logger Photoshop::s_logger = Logger("Photoshop");
 
@@ -97,6 +97,7 @@ void Photoshop::runMainLoop(void)
   TransformStack   stack;
   SfmlEventManager event_manager(m_window, stack);
   SfmlRenderTarget wrapped_rt(m_window);
+  const sf::Color bg_color(50, 50, 50);
 
   /* TODO: remove stub */
   m_editorState.getFilters().setLastFilter(
@@ -115,6 +116,7 @@ void Photoshop::runMainLoop(void)
       break;
     }
 
+    m_window.clear(bg_color);
     m_widgetTree->draw(stack, wrapped_rt);
     m_window.display();
   }

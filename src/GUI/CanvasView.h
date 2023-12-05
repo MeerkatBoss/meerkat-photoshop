@@ -14,6 +14,8 @@
 
 #include "Canvas/Canvas.h"
 #include "Common/GUI/Widget.h"
+#include "GUI/Titlebar.h"
+#include "Layout/LayoutBox.h"
 #include "Tool/ToolPalette.h"
 
 namespace gui
@@ -25,6 +27,7 @@ public:
   CanvasView(ToolPalette& palette, Canvas& canvas,
              const plug::LayoutBox& layout_box) :
       Widget(layout_box),
+      m_titlebar(canvas.getName(), layout::LayoutBox(100_per, 1_cm)),
       m_palette(palette),
       m_canvas(canvas),
       m_isFocused(false)
@@ -39,6 +42,12 @@ public:
 
   virtual void draw(plug::TransformStack& stack,
                     plug::RenderTarget&   target) override;
+
+  void onParentUpdate(const plug::LayoutBox& parent_box) override
+  {
+    Widget::onParentUpdate(parent_box);
+    m_titlebar.onParentUpdate(getLayoutBox());
+  }
 
 protected:
   virtual void onMousePressed(const plug::MousePressedEvent& event,
@@ -58,6 +67,8 @@ protected:
 
 private:
   plug::Transform getCanvasTransform(void) const;
+
+  Titlebar m_titlebar;
 
   ToolPalette& m_palette;
   Canvas&      m_canvas;

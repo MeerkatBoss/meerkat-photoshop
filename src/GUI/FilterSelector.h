@@ -29,9 +29,6 @@ public:
 
   virtual void draw(plug::TransformStack& stack, plug::RenderTarget& target) override
   {
-    /* TODO: REMOVE STUB */
-    m_palette.getLastFilter().getWidget()->draw(stack, target);
-
     /* TODO: Draw filter selection menu */
     /* TODO: Draw filter configuration widget */
   }

@@ -10,7 +10,9 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   using plug::Vec2d;
   using plug::Vertex;
 
-  const auto [tl, tr, bl, br] = getRect(getLayoutBox());
+  const plug::Color bg_color(40, 40, 45);
+
+  // const auto [tl, tr, bl, br] = getRect(getLayoutBox());
   const Vec2d canvas_size     = m_canvas.getSize();
 
   const Vec2d tex_tl(0, 0);
@@ -19,20 +21,24 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   const Vec2d tex_br(canvas_size.x, canvas_size.y);
 
   plug::VertexArray array(plug::TriangleStrip, 4);
-  array[0] = Vertex{.position = stack.apply(tl), .tex_coords = tex_tl};
-  array[1] = Vertex{.position = stack.apply(tr), .tex_coords = tex_tr};
-  array[2] = Vertex{.position = stack.apply(bl), .tex_coords = tex_bl};
-  array[3] = Vertex{.position = stack.apply(br), .tex_coords = tex_br};
+  stack.enter(getCanvasTransform());
 
+  array[0] = Vertex{.position = stack.apply(tex_tl), .tex_coords = tex_tl};
+  array[1] = Vertex{.position = stack.apply(tex_tr), .tex_coords = tex_tr};
+  array[2] = Vertex{.position = stack.apply(tex_bl), .tex_coords = tex_bl};
+  array[3] = Vertex{.position = stack.apply(tex_br), .tex_coords = tex_br};
   target.draw(array, m_canvas.getTexture());
 
   plug::Widget* tool_widget = m_palette.getActiveTool().getWidget();
   if (m_isFocused && tool_widget != nullptr)
   {
-    stack.enter(getCanvasTransform());
     tool_widget->draw(stack, target);
-    stack.leave();
   }
+  stack.leave();
+
+  stack.enter(Transform(getLayoutBox().getPosition()));
+  m_titlebar.draw(stack, target);
+  stack.leave();
 }
 
 void CanvasView::onMousePressed(const plug::MousePressedEvent& event,
@@ -144,7 +150,7 @@ void CanvasView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
 }
 
 void CanvasView::onKeyboardReleased(const plug::KeyboardReleasedEvent& event,
-                                   plug::EHC&                        context)
+                                    plug::EHC&                         context)
 {
   if (context.stopped)
   {
