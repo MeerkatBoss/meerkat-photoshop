@@ -29,7 +29,8 @@ public:
   EditorView(EditorState& editor_state, const plug::LayoutBox& layout_box) :
       Widget(layout_box),
       m_editorState(editor_state),
-      m_filterSelector(editor_state.getFilters()),
+      m_filterSelector(editor_state.getFilters(),
+          layout::LayoutBox(5_cm, 50_per, layout::Align::TopRight)),
       m_toolSelector(editor_state.getTools()),
       m_colorSelector(
           editor_state.getColors(),

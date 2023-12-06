@@ -163,6 +163,32 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
     size_t new_idx = (m_activeViewIdx + 1) % m_views.getSize();
     setActiveView(m_views[new_idx]);
   }
+
+  if (event.key_id == plug::KeyCode::Enter)
+  {
+    plug::Filter* selected      = m_filterSelector.getSelectedFilter();
+    plug::Canvas* active_canvas = m_editorState.getActiveCanvas();
+
+    if (selected != nullptr && active_canvas != nullptr)
+    {
+      selected->applyFilter(*active_canvas);
+      m_filterSelector.deselect();
+      size_t filter_count = m_editorState.getFilters().getFilterCount();
+      for (size_t i = 0; i < filter_count; ++i)
+      {
+        if (selected == &m_editorState.getFilters().getFilter(i))
+        {
+          m_editorState.getFilters().setLastFilter(i);
+          break;
+        }
+      }
+    }
+  }
+
+  if (event.key_id == plug::KeyCode::Escape)
+  {
+    m_filterSelector.deselect();
+  }
 }
 
 } // namespace gui

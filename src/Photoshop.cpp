@@ -1,5 +1,4 @@
 #include "Photoshop.h"
-
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 
@@ -98,10 +97,6 @@ void Photoshop::runMainLoop(void)
   SfmlEventManager event_manager(m_window, stack);
   SfmlRenderTarget wrapped_rt(m_window);
   const sf::Color bg_color(50, 50, 50);
-
-  /* TODO: remove stub */
-  m_editorState.getFilters().setLastFilter(
-      m_editorState.getFilters().getFilterCount() - 1);
 
   /* TODO: remove stub */
   m_editorState.getTools().setActiveTool(
