@@ -67,7 +67,6 @@ public:
     m_box = box.clone();
   }
 
-protected:
   bool covers(plug::TransformStack& stack,
               const plug::Vec2d&    position) const override;
 

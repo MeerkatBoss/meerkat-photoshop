@@ -50,7 +50,7 @@ int main()
 
   logger.LOG_INFO(ContentType::TEXT, "Started logs");
 
-  Photoshop app(1080, 720);
+  Photoshop app(1600, 900);
   app.loadPlugins("Plugins/");
   app.initGUI();
   app.runMainLoop();

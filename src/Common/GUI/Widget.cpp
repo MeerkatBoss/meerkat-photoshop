@@ -78,7 +78,7 @@ void Widget::onEvent(const plug::Event& event, plug::EHC& context)
 
 static inline bool isSmall(double a) { return fabs(a) < 1e-6; }
 
-bool Widget::covers(plug::TransformStack&, const plug::Vec2d& position) const
+bool Widget::covers(plug::TransformStack& stack, const plug::Vec2d& position) const
 {
   if (isSmall(m_box->getSize().x) || isSmall(m_box->getSize().y))
   {
@@ -87,10 +87,12 @@ bool Widget::covers(plug::TransformStack&, const plug::Vec2d& position) const
 
   auto [tl, tr, bl, br] = getRect(getLayoutBox());
 
-  bool top_check    = plug::cross(tl - tr, position - tr) <= 0.0;
-  bool right_check  = plug::cross(tr - br, position - br) <= 0.0;
-  bool bottom_check = plug::cross(br - bl, position - bl) <= 0.0;
-  bool left_check   = plug::cross(bl - tl, position - tl) <= 0.0;
+  const plug::Vec2d local_position = stack.restore(position);
+
+  bool top_check    = plug::cross(tl - tr, local_position - tr) <= 0.0;
+  bool right_check  = plug::cross(tr - br, local_position - br) <= 0.0;
+  bool bottom_check = plug::cross(br - bl, local_position - bl) <= 0.0;
+  bool left_check   = plug::cross(bl - tl, local_position - tl) <= 0.0;
 
   return top_check && right_check && bottom_check && left_check;
 }

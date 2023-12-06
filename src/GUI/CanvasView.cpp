@@ -54,6 +54,19 @@ void CanvasView::onMousePressed(const plug::MousePressedEvent& event,
     context.overlapped = true;
     if (event.button_id == plug::MouseButton::Left)
     {
+      context.stack.enter(Transform(getLayoutBox().getPosition()));
+      if (m_titlebar.covers(context.stack, event.pos))
+      {
+        m_isMoving = true;
+        m_lastPos = context.stack.restore(event.pos);
+      }
+      context.stack.leave();
+      
+      if (m_isMoving)
+      {
+        return;
+      }
+
       context.stopped = true;
       context.stack.enter(getCanvasTransform());
 
@@ -83,10 +96,16 @@ void CanvasView::onMouseReleased(const plug::MouseReleasedEvent& event,
     context.overlapped = true;
   }
 
+
   if (event.button_id == plug::MouseButton::Left)
   {
     context.stopped = true;
     context.stack.enter(getCanvasTransform());
+    if (m_isMoving)
+    {
+      m_isMoving = false;
+      return;
+    }
 
     m_palette.getActiveTool().onMainButton({plug::State::Released},
                                            context.stack.restore(event.pos));
@@ -115,6 +134,15 @@ void CanvasView::onMouseMove(const plug::MouseMoveEvent& event,
   if (covers(context.stack, event.pos))
   {
     context.overlapped = true;
+  }
+
+  if (m_isMoving)
+  {
+    const Vec2d parent_pos = context.stack.restore(event.pos);
+
+    getLayoutBox().setPosition(parent_pos - m_lastPos);
+
+    return;
   }
 
   context.stack.enter(getCanvasTransform());

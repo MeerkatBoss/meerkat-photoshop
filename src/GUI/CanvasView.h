@@ -30,6 +30,7 @@ public:
       m_titlebar(canvas.getName(), layout::LayoutBox(100_per, 1_cm)),
       m_palette(palette),
       m_canvas(canvas),
+      m_isMoving(false),
       m_isFocused(false)
   {
   }
@@ -72,6 +73,8 @@ private:
 
   ToolPalette& m_palette;
   Canvas&      m_canvas;
+  bool         m_isMoving;
+  Vec2d        m_lastPos;
 
   bool m_isFocused;
 };

@@ -82,7 +82,7 @@ void Photoshop::initGUI(void)
       m_editorState, LayoutBox(100_per, 100_per, Align::Center));
   editor_view->addCanvasView(new gui::CanvasView(
       m_editorState.getTools(), *m_editorState.getActiveCanvas(),
-      LayoutBox(15_cm, 15_cm, Align::Center)));
+      LayoutBox(15_cm, 15_cm, Align::Free)));
 
   root->addWidget(editor_view);
 
