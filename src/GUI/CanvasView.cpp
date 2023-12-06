@@ -10,29 +10,58 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   using plug::Vec2d;
   using plug::Vertex;
 
-  const auto [tl, tr, bl, br] = getRect(getLayoutBox());
-  const Vec2d canvas_size     = m_canvas.getSize();
+  const plug::Color bg_color(40, 40, 45);
+
+  plug::VertexArray array(plug::TriangleStrip, 4);
+
+  if (m_isFocused)
+  {
+    const plug::Color border_color(200, 128, 0);
+    const auto [tl, tr, bl, br] = getRect(getLayoutBox());
+    const double border_width   = 5;
+    const Vec2d  x_off(border_width, 0);
+    const Vec2d  y_off(0, border_width);
+
+    array[0] = Vertex{.position   = stack.apply(tl - x_off - y_off),
+                      .tex_coords = Vec2d(),
+                      .color      = border_color};
+    array[1] = Vertex{.position   = stack.apply(tr + x_off - y_off),
+                      .tex_coords = Vec2d(),
+                      .color      = border_color};
+    array[2] = Vertex{.position   = stack.apply(bl - x_off + y_off),
+                      .tex_coords = Vec2d(),
+                      .color      = border_color};
+    array[3] = Vertex{.position   = stack.apply(br + x_off + y_off),
+                      .tex_coords = Vec2d(),
+                      .color      = border_color};
+    target.draw(array);
+  }
+
+  const Vec2d canvas_size = m_canvas.getSize();
 
   const Vec2d tex_tl(0, 0);
   const Vec2d tex_tr(canvas_size.x, 0);
   const Vec2d tex_bl(0, canvas_size.y);
   const Vec2d tex_br(canvas_size.x, canvas_size.y);
 
-  plug::VertexArray array(plug::TriangleStrip, 4);
-  array[0] = Vertex{.position = stack.apply(tl), .tex_coords = tex_tl};
-  array[1] = Vertex{.position = stack.apply(tr), .tex_coords = tex_tr};
-  array[2] = Vertex{.position = stack.apply(bl), .tex_coords = tex_bl};
-  array[3] = Vertex{.position = stack.apply(br), .tex_coords = tex_br};
+  stack.enter(getCanvasTransform());
 
+  array[0] = Vertex{.position = stack.apply(tex_tl), .tex_coords = tex_tl};
+  array[1] = Vertex{.position = stack.apply(tex_tr), .tex_coords = tex_tr};
+  array[2] = Vertex{.position = stack.apply(tex_bl), .tex_coords = tex_bl};
+  array[3] = Vertex{.position = stack.apply(tex_br), .tex_coords = tex_br};
   target.draw(array, m_canvas.getTexture());
 
   plug::Widget* tool_widget = m_palette.getActiveTool().getWidget();
   if (m_isFocused && tool_widget != nullptr)
   {
-    stack.enter(getCanvasTransform());
     tool_widget->draw(stack, target);
-    stack.leave();
   }
+  stack.leave();
+
+  stack.enter(Transform(getLayoutBox().getPosition()));
+  m_titlebar.draw(stack, target);
+  stack.leave();
 }
 
 void CanvasView::onMousePressed(const plug::MousePressedEvent& event,
@@ -48,6 +77,19 @@ void CanvasView::onMousePressed(const plug::MousePressedEvent& event,
     context.overlapped = true;
     if (event.button_id == plug::MouseButton::Left)
     {
+      context.stack.enter(Transform(getLayoutBox().getPosition()));
+      if (m_titlebar.covers(context.stack, event.pos))
+      {
+        m_isMoving = true;
+        m_lastPos  = context.stack.restore(event.pos);
+      }
+      context.stack.leave();
+
+      if (m_isMoving)
+      {
+        return;
+      }
+
       context.stopped = true;
       context.stack.enter(getCanvasTransform());
 
@@ -81,6 +123,11 @@ void CanvasView::onMouseReleased(const plug::MouseReleasedEvent& event,
   {
     context.stopped = true;
     context.stack.enter(getCanvasTransform());
+    if (m_isMoving)
+    {
+      m_isMoving = false;
+      return;
+    }
 
     m_palette.getActiveTool().onMainButton({plug::State::Released},
                                            context.stack.restore(event.pos));
@@ -109,6 +156,15 @@ void CanvasView::onMouseMove(const plug::MouseMoveEvent& event,
   if (covers(context.stack, event.pos))
   {
     context.overlapped = true;
+  }
+
+  if (m_isMoving)
+  {
+    const Vec2d parent_pos = context.stack.restore(event.pos);
+
+    getLayoutBox().setPosition(parent_pos - m_lastPos);
+
+    return;
   }
 
   context.stack.enter(getCanvasTransform());
@@ -144,7 +200,7 @@ void CanvasView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
 }
 
 void CanvasView::onKeyboardReleased(const plug::KeyboardReleasedEvent& event,
-                                   plug::EHC&                        context)
+                                    plug::EHC&                         context)
 {
   if (context.stopped)
   {

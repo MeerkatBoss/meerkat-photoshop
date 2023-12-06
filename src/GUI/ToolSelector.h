@@ -13,7 +13,7 @@
 #define __GUI_TOOL_SELECTOR_H
 
 #include "Common/GUI/Widget.h"
-#include "Impl/LayoutBox/LayoutBox.h"
+#include "Common/Layout/LayoutBox.h"
 #include "Math.h"
 #include "Tool/ToolPalette.h"
 
@@ -24,7 +24,7 @@ class ToolSelector : public Widget
 {
 public:
   ToolSelector(ToolPalette& palette) :
-      Widget(LayoutBox()), // TODO: Replace stub layout
+      Widget(layout::LayoutBox()), // TODO: Replace stub layout
       m_palette(palette)
   {
   }

@@ -2,6 +2,7 @@
 
 #include "Common/GUI/Widget.h"
 #include "GUI/CanvasView.h"
+#include "Layout/LayoutBox.h"
 #include "Math.h"
 
 namespace gui
@@ -26,6 +27,7 @@ void EditorView::addCanvasView(CanvasView* canvas_view)
   }
   m_activeView = canvas_view;
   m_activeView->focus();
+  m_activeViewIdx = m_views.getSize() - 1;
 }
 
 void EditorView::setActiveView(CanvasView* canvas_view)
@@ -35,8 +37,15 @@ void EditorView::setActiveView(CanvasView* canvas_view)
   {
     if (m_views[i] == canvas_view)
     {
+      if (m_activeView != nullptr)
+      {
+        m_activeView->unfocus();
+      }
+
       m_editorState.setActiveCanvas(&canvas_view->getCanvas());
       m_activeView = canvas_view;
+      m_activeView->focus();
+      m_activeViewIdx = i;
       return;
     }
   }
@@ -60,6 +69,8 @@ void EditorView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
     m_activeView->draw(stack, target);
   }
 
+  m_colorSelector.draw(stack, target);
+
   m_toolSelector.draw(stack, target);
 
   m_filterSelector.draw(stack, target);
@@ -76,6 +87,8 @@ void EditorView::onEvent(const plug::Event& event, plug::EHC& context)
   m_filterSelector.onEvent(event, context);
 
   m_toolSelector.onEvent(event, context);
+
+  m_colorSelector.onEvent(event, context);
 
   if (m_activeView != nullptr)
   {
@@ -99,6 +112,7 @@ void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
   getLayoutBox().onParentUpdate(parent_box);
   m_filterSelector.onParentUpdate(getLayoutBox());
   m_toolSelector.onParentUpdate(getLayoutBox());
+  m_colorSelector.onParentUpdate(getLayoutBox());
 
   const size_t view_count = m_views.getSize();
   for (size_t i = 0; i < view_count; ++i)
@@ -125,5 +139,56 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
       m_editorState.getFilters().getLastFilter().applyFilter(*active_canvas);
     }
   }
+
+  static const char* names[] = {
+      "Unknown.png",   "Unknown_1.png", "Unknown_2.png", "Unknown_3.png",
+      "Unknown_4.png", "Unknown_5.png", "Unknown_6.png", "Unknown_7.png",
+      "Unknown_8.png", "Unknown_9.png"};
+
+  if (event.ctrl && event.key_id == plug::KeyCode::N)
+  {
+    m_editorState.newCanvas(names[m_editorState.getCanvasCount()], 1000, 1000);
+    addCanvasView(new CanvasView(m_editorState.getTools(),
+                                 *m_editorState.getAllCanvases().back(),
+                                 layout::LayoutBox(15_cm, 15_cm)));
+  }
+
+  if (event.key_id == plug::KeyCode::Tab)
+  {
+    if (m_views.getSize() == 0)
+    {
+      return;
+    }
+
+    size_t new_idx = (m_activeViewIdx + 1) % m_views.getSize();
+    setActiveView(m_views[new_idx]);
+  }
+
+  if (event.key_id == plug::KeyCode::Enter)
+  {
+    plug::Filter* selected      = m_filterSelector.getSelectedFilter();
+    plug::Canvas* active_canvas = m_editorState.getActiveCanvas();
+
+    if (selected != nullptr && active_canvas != nullptr)
+    {
+      selected->applyFilter(*active_canvas);
+      m_filterSelector.deselect();
+      size_t filter_count = m_editorState.getFilters().getFilterCount();
+      for (size_t i = 0; i < filter_count; ++i)
+      {
+        if (selected == &m_editorState.getFilters().getFilter(i))
+        {
+          m_editorState.getFilters().setLastFilter(i);
+          break;
+        }
+      }
+    }
+  }
+
+  if (event.key_id == plug::KeyCode::Escape)
+  {
+    m_filterSelector.deselect();
+  }
 }
+
 } // namespace gui

@@ -16,6 +16,7 @@
 #include "DynArray.h"
 #include "EditorState.h"
 #include "GUI/CanvasView.h"
+#include "GUI/ColorSelector.h"
 #include "GUI/FilterSelector.h"
 #include "GUI/ToolSelector.h"
 
@@ -28,11 +29,23 @@ public:
   EditorView(EditorState& editor_state, const plug::LayoutBox& layout_box) :
       Widget(layout_box),
       m_editorState(editor_state),
-      m_filterSelector(editor_state.getFilters()),
+      m_filterSelector(editor_state.getFilters(),
+          layout::LayoutBox(5_cm, 50_per, layout::Align::TopRight)),
       m_toolSelector(editor_state.getTools()),
+      m_colorSelector(
+          editor_state.getColors(),
+          layout::LayoutBox(5_cm, 100_per, layout::Align::CenterLeft)),
       m_views(),
       m_activeView(nullptr)
   {
+    m_colorSelector.addColor(plug::Color(0, 0, 0));
+    m_colorSelector.addColor(plug::Color(255, 0, 0));
+    m_colorSelector.addColor(plug::Color(0, 255, 0));
+    m_colorSelector.addColor(plug::Color(0, 0, 255));
+    m_colorSelector.addColor(plug::Color(255, 255, 0));
+    m_colorSelector.addColor(plug::Color(255, 0, 255));
+    m_colorSelector.addColor(plug::Color(0, 255, 255));
+    m_colorSelector.addColor(plug::Color(255, 255, 255));
   }
 
   virtual ~EditorView(void) override
@@ -65,8 +78,10 @@ private:
 
   FilterSelector        m_filterSelector;
   ToolSelector          m_toolSelector;
+  ColorSelector         m_colorSelector;
   DynArray<CanvasView*> m_views;
   CanvasView*           m_activeView;
+  size_t                m_activeViewIdx;
 };
 
 } // namespace gui
