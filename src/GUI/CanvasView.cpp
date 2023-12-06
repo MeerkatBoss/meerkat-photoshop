@@ -12,15 +12,38 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 
   const plug::Color bg_color(40, 40, 45);
 
-  // const auto [tl, tr, bl, br] = getRect(getLayoutBox());
-  const Vec2d canvas_size     = m_canvas.getSize();
+  plug::VertexArray array(plug::TriangleStrip, 4);
+
+  if (m_isFocused)
+  {
+    const plug::Color border_color(200, 128, 0);
+    const auto [tl, tr, bl, br] = getRect(getLayoutBox());
+    const double border_width   = 5;
+    const Vec2d  x_off(border_width, 0);
+    const Vec2d  y_off(0, border_width);
+
+    array[0] = Vertex{.position   = stack.apply(tl - x_off - y_off),
+                      .tex_coords = Vec2d(),
+                      .color      = border_color};
+    array[1] = Vertex{.position   = stack.apply(tr + x_off - y_off),
+                      .tex_coords = Vec2d(),
+                      .color      = border_color};
+    array[2] = Vertex{.position   = stack.apply(bl - x_off + y_off),
+                      .tex_coords = Vec2d(),
+                      .color      = border_color};
+    array[3] = Vertex{.position   = stack.apply(br + x_off + y_off),
+                      .tex_coords = Vec2d(),
+                      .color      = border_color};
+    target.draw(array);
+  }
+
+  const Vec2d canvas_size = m_canvas.getSize();
 
   const Vec2d tex_tl(0, 0);
   const Vec2d tex_tr(canvas_size.x, 0);
   const Vec2d tex_bl(0, canvas_size.y);
   const Vec2d tex_br(canvas_size.x, canvas_size.y);
 
-  plug::VertexArray array(plug::TriangleStrip, 4);
   stack.enter(getCanvasTransform());
 
   array[0] = Vertex{.position = stack.apply(tex_tl), .tex_coords = tex_tl};
@@ -58,10 +81,10 @@ void CanvasView::onMousePressed(const plug::MousePressedEvent& event,
       if (m_titlebar.covers(context.stack, event.pos))
       {
         m_isMoving = true;
-        m_lastPos = context.stack.restore(event.pos);
+        m_lastPos  = context.stack.restore(event.pos);
       }
       context.stack.leave();
-      
+
       if (m_isMoving)
       {
         return;
@@ -95,7 +118,6 @@ void CanvasView::onMouseReleased(const plug::MouseReleasedEvent& event,
   {
     context.overlapped = true;
   }
-
 
   if (event.button_id == plug::MouseButton::Left)
   {

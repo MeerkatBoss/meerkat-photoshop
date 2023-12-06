@@ -67,6 +67,7 @@ private:
   ToolSelector          m_toolSelector;
   DynArray<CanvasView*> m_views;
   CanvasView*           m_activeView;
+  size_t                m_activeViewIdx;
 };
 
 } // namespace gui
