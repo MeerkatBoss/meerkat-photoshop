@@ -69,6 +69,8 @@ void EditorView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
     m_activeView->draw(stack, target);
   }
 
+  m_colorSelector.draw(stack, target);
+
   m_toolSelector.draw(stack, target);
 
   m_filterSelector.draw(stack, target);
@@ -85,6 +87,8 @@ void EditorView::onEvent(const plug::Event& event, plug::EHC& context)
   m_filterSelector.onEvent(event, context);
 
   m_toolSelector.onEvent(event, context);
+
+  m_colorSelector.onEvent(event, context);
 
   if (m_activeView != nullptr)
   {
@@ -108,6 +112,7 @@ void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
   getLayoutBox().onParentUpdate(parent_box);
   m_filterSelector.onParentUpdate(getLayoutBox());
   m_toolSelector.onParentUpdate(getLayoutBox());
+  m_colorSelector.onParentUpdate(getLayoutBox());
 
   const size_t view_count = m_views.getSize();
   for (size_t i = 0; i < view_count; ++i)
