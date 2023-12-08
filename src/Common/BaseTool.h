@@ -43,6 +43,8 @@ public:
 
   virtual ~BaseTool() override;
 
+  bool loadTool(void);
+
   /*****************************************************************************
    *
    * plug::Plugin implementation
@@ -94,8 +96,8 @@ protected:
 
 private:
   static size_t s_idCounter;
-
   static Logger s_logger;
+  static bool s_isLoaded;
 
   size_t m_refCount;
 

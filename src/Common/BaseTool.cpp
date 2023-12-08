@@ -6,6 +6,8 @@ size_t BaseTool::s_idCounter = 0;
 
 Logger BaseTool::s_logger = Logger("Tool");
 
+bool BaseTool::s_isLoaded = false;
+
 BaseTool::BaseTool(const char* name, const char* icon_path) :
     m_refCount(1),
     m_toolId(++s_idCounter),
@@ -22,6 +24,19 @@ BaseTool::~BaseTool()
 {
   s_logger.LOG_DEBUG(Content::TEXT, "Destroyed tool \"%s\" (id %zu)",
                      m_data.getName(), m_toolId);
+}
+
+bool BaseTool::loadTool(void)
+{
+  LOG_ASSERT(s_logger, !s_isLoaded, "Tool '%s' is already loaded",
+             m_data.getName());
+  if (s_isLoaded)
+  {
+    return false;
+  }
+
+  s_isLoaded = true;
+  return true;
 }
 
 [[maybe_unused]] static const char* guidToString(plug::PluginGuid guid);
@@ -151,8 +166,9 @@ void BaseTool::onMainButton([[maybe_unused]] const plug::ControlState& state,
       position.y, m_data.getName(), m_toolId);
 }
 
-void BaseTool::onSecondaryButton([[maybe_unused]] const plug::ControlState& state,
-                                 [[maybe_unused]] const Vec2d&              position)
+void BaseTool::onSecondaryButton(
+    [[maybe_unused]] const plug::ControlState& state,
+    [[maybe_unused]] const Vec2d&              position)
 {
   s_logger.LOG_TRACE(
       Content::TEXT,

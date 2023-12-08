@@ -5,6 +5,12 @@
 
 extern "C" plug::Plugin* loadPlugin(void)
 {
+  NegativeFilter* filter = new NegativeFilter();
+  if (!filter->loadFilter())
+  {
+    filter->release();
+    return nullptr;
+  }
 #ifndef NLOGS
   auto& log_writer =
       mklog::LogManager::addWriter<mklog::TextLogWriter>().setFile(
@@ -20,7 +26,7 @@ extern "C" plug::Plugin* loadPlugin(void)
   }
 #endif // NLOGS
 
-  return new NegativeFilter();
+  return filter;
 }
 
 static uint8_t clampChannel(size_t value) { return value > 255 ? 255 : value; }

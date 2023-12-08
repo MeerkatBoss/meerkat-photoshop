@@ -42,6 +42,8 @@ public:
 
   virtual ~BaseFilter() override;
 
+  bool loadFilter(void);
+
   /*****************************************************************************
    *
    * plug::Plugin implementation
@@ -66,8 +68,8 @@ public:
 
 private:
   static size_t s_idCounter;
-
   static Logger s_logger;
+  static bool   s_isLoaded;
 
   const size_t     m_filterId;
   const FilterData m_data;

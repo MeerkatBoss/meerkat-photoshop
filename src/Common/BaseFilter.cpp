@@ -4,6 +4,8 @@ size_t BaseFilter::s_idCounter = 0;
 
 Logger BaseFilter::s_logger = Logger("Filter");
 
+bool BaseFilter::s_isLoaded = false;
+
 BaseFilter::BaseFilter(const char* name, const char* icon_path) :
     m_filterId(++s_idCounter), m_data(name, icon_path), m_refCount(1)
 {
@@ -16,6 +18,19 @@ BaseFilter::~BaseFilter()
 {
   s_logger.LOG_DEBUG(Content::TEXT, "Destroyed filter \"%s\" (id %zu)",
                      m_data.getName(), m_filterId);
+}
+
+bool BaseFilter::loadFilter(void)
+{
+  LOG_ASSERT(s_logger, !s_isLoaded, "Filter '%s' is already loaded",
+             m_data.getName());
+  if (s_isLoaded)
+  {
+    return false;
+  }
+
+  s_isLoaded = true;
+  return true;
 }
 
 [[maybe_unused]] static const char* guidToString(plug::PluginGuid guid);

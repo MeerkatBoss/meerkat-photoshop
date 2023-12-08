@@ -4,6 +4,12 @@
 
 extern "C" plug::Plugin* loadPlugin(void)
 {
+  PosterizeFilter* filter = new PosterizeFilter();
+  if (!filter->loadFilter())
+  {
+    filter->release();
+    return nullptr;
+  }
 #ifndef NLOGS
   auto& log_writer =
       mklog::LogManager::addWriter<mklog::TextLogWriter>().setFile(
@@ -19,7 +25,7 @@ extern "C" plug::Plugin* loadPlugin(void)
   }
 #endif // NLOGS
 
-  return new PosterizeFilter();
+  return filter;
 }
 
 static uint8_t posterizeChannel(uint8_t original, size_t level_count)
@@ -53,7 +59,6 @@ void PosterizeFilter::applyFilter(plug::Canvas& canvas) const
                         posterizeChannel(color.green, m_colorLevelsCount),
                         posterizeChannel(color.blue, m_colorLevelsCount),
                         color.alpha));
-        
       }
     }
   }

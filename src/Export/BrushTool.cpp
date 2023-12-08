@@ -7,9 +7,17 @@
 
 extern "C" plug::Plugin* loadPlugin(void)
 {
+  BrushTool* tool = new BrushTool(10);
+  if (!tool->loadTool())
+  {
+    tool->release();
+    return nullptr;
+  }
+
 #ifndef NLOGS
-  auto& log_writer = mklog::LogManager::addWriter<mklog::TextLogWriter>()
-    .setFile("Plugins/BrushTool/_log.txt");
+  auto& log_writer =
+      mklog::LogManager::addWriter<mklog::TextLogWriter>().setFile(
+          "Plugins/BrushTool/_log.txt");
   if (!log_writer.valid())
   {
     log_writer.setFile("_meerkat_brush_tool_log.txt");
@@ -21,12 +29,12 @@ extern "C" plug::Plugin* loadPlugin(void)
   }
 #endif // NLOGS
 
-  return new BrushTool(10);
+  return tool;
 }
 
 void BrushTool::onMove(const Vec2d& position)
 {
-  BaseTool::onMove(position); 
+  BaseTool::onMove(position);
   if (m_isDrawing)
   {
     drawLine(m_lastPos, position);
