@@ -18,6 +18,9 @@
 void getLineVertexArray(const Vec2d& start, const Vec2d& end, double radius,
                         const plug::Color& color, plug::VertexArray& array);
 
+void getCircleVertexArray(const Vec2d& center, double radius, double thickness,
+                          const plug::Color& color, plug::VertexArray& array);
+
 class CatmullRomSpline
 {
 public:

@@ -20,15 +20,9 @@ extern "C" plug::Plugin* loadPlugin(void);
 class BrushTool : public BaseTool
 {
 public:
-  BrushTool(double radius) :
-      BaseTool("Brush Tool", nullptr),
-      m_radius(radius),
-      m_isDrawing(false),
-      m_lastPos()
-  {
-  }
+  BrushTool(double radius = 10);
 
-  virtual ~BrushTool() override {}
+  virtual ~BrushTool() override { delete m_widget; }
 
   virtual void onMove(const Vec2d& position) override;
 
@@ -38,7 +32,7 @@ public:
   virtual void onSecondaryButton(const plug::ControlState&,
                                  const Vec2d&) override{};
 
-  virtual plug::Widget* getWidget() override { return nullptr; }
+  virtual plug::Widget* getWidget() override { return m_widget; }
 
 private:
   void drawLine(const Vec2d& start, const Vec2d& end);
@@ -47,6 +41,8 @@ private:
 
   bool  m_isDrawing;
   Vec2d m_lastPos;
+
+  plug::Widget* m_widget;
 };
 
 #endif /* BrushTool.h */

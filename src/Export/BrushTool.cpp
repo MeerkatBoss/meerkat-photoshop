@@ -1,13 +1,18 @@
 #include "Export/BrushTool.h"
 
+#include <SFML/Graphics/PrimitiveType.hpp>
 #include <cassert>
 #include <cstdio>
 
 #include "Common/mklog/writers/TextLogWriter.h"
+#include "DrawHelpers.h"
+#include "GUI/Widget.h"
+#include "Layout/LayoutBox.h"
+#include "Math.h"
 
 extern "C" plug::Plugin* loadPlugin(void)
 {
-  BrushTool* tool = new BrushTool(10);
+  BrushTool* tool = new BrushTool();
   if (!tool->loadTool())
   {
     tool->release();
@@ -30,6 +35,56 @@ extern "C" plug::Plugin* loadPlugin(void)
 #endif // NLOGS
 
   return tool;
+}
+
+class BrushWidget : public gui::Widget
+{
+public:
+  BrushWidget(const double& radius) :
+      gui::Widget(layout::LayoutBox()), m_radius(radius)
+  {
+  }
+
+protected:
+  virtual void onMouseMove(const plug::MouseMoveEvent& event,
+                           plug::EHC&                  context) override
+  {
+    if (!context.stopped)
+    {
+      m_position = event.pos;
+    }
+  }
+
+  virtual void draw(plug::TransformStack& stack,
+                    plug::RenderTarget&   target) override
+  {
+    const size_t      point_count = 40;
+    const plug::Color color(0, 0, 255);
+
+    const Transform transform(m_position, stack.top().getScale());
+
+    plug::VertexArray array(plug::TriangleStrip, point_count);
+    getCircleVertexArray(Vec2d(0, 0), m_radius, 2, color, array);
+
+    for (size_t i = 0; i < point_count; ++i)
+    {
+      array[i].position = transform.apply(array[i].position);
+    }
+    target.draw(array);
+  }
+
+private:
+  Vec2d         m_position;
+  const double& m_radius;
+};
+
+BrushTool::BrushTool(double radius) :
+    BaseTool("Brush Tool", nullptr),
+    m_radius(radius),
+    m_isDrawing(false),
+    m_lastPos(),
+    m_widget(new BrushWidget(m_radius))
+{
 }
 
 void BrushTool::onMove(const Vec2d& position)

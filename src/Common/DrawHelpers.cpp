@@ -4,6 +4,87 @@
 
 static Logger s_logger = Logger("Draw Helpers");
 
+static void makeFilledCircle(const Vec2d& center, double radius,
+                             const plug::Color& color,
+                             plug::VertexArray& array);
+
+static void makeThickCircle(const Vec2d& center, double radius,
+                            double thickness, const plug::Color& color,
+                            plug::VertexArray& array);
+
+void getCircleVertexArray(const Vec2d& center, double radius, double thickness,
+                          const plug::Color& color, plug::VertexArray& array)
+{
+  if (radius <= thickness)
+  {
+    makeFilledCircle(center, radius, color, array);
+    return;
+  }
+
+  makeThickCircle(center, radius, thickness, color, array);
+}
+
+static void makeFilledCircle(const Vec2d& center, double radius,
+                             const plug::Color& color, plug::VertexArray& array)
+{
+  LOG_ASSERT(s_logger, array.getSize() > 2,
+             "Vertex array is too small for circle");
+  if (array.getSize() <= 2)
+  {
+    return;
+  }
+
+  const size_t point_count = array.getSize();
+  const double angle_step = 2 * M_PI / point_count;
+  for (size_t i = 0; i < point_count; ++i)
+  {
+    const Vec2d direction(cos(i*angle_step), sin(i*angle_step));
+    array[i] = plug::Vertex{
+      .position = center + radius * direction,
+      .tex_coords = Vec2d(),
+      .color = color
+    };
+  }
+  array.setPrimitive(plug::TriangleFan);
+}
+
+static void makeThickCircle(const Vec2d& center, double radius,
+                            double thickness, const plug::Color& color,
+                            plug::VertexArray& array)
+{
+  constexpr size_t min_point_count = 2*4;
+  LOG_ASSERT(s_logger, array.getSize() >= min_point_count, 
+      "Vertex array is too small for circle");
+  if (array.getSize() < min_point_count)
+  {
+    return;
+  }
+
+  const size_t point_count = (array.getSize() / 2) - 1;
+  const double angle_step = 2 * M_PI / point_count;
+
+  for (size_t i = 0; i < point_count; ++i)
+  {
+    const Vec2d direction(cos(i*angle_step), sin(i*angle_step));
+    array[2*i] = plug::Vertex{
+      .position = center + radius * direction,
+      .tex_coords = Vec2d(),
+      .color = color
+    };
+    array[2*i+1] = plug::Vertex{
+      .position = center + (radius - thickness) * direction,
+      .tex_coords = Vec2d(),
+      .color = color
+    };
+  }
+  for (size_t i = 2*point_count; i < array.getSize(); ++i)
+  {
+    array[i] = array[i - 2*point_count];
+  }
+
+  array.setPrimitive(plug::TriangleStrip);
+}
+
 void getLineVertexArray(const Vec2d& start, const Vec2d& end, double radius,
                         const plug::Color& color, plug::VertexArray& array)
 {
@@ -50,18 +131,19 @@ void getLineVertexArray(const Vec2d& start, const Vec2d& end, double radius,
   array.setPrimitive(plug::TriangleFan);
 }
 
-__attribute__((always_inline))
-static double getCatmullRomKnot(Vec2d cur_point, Vec2d next_point,
-                                double prev_knot)
+__attribute__((always_inline)) static double getCatmullRomKnot(Vec2d cur_point,
+                                                               Vec2d next_point,
+                                                               double prev_knot)
 {
   const double distance = (next_point - cur_point).length();
 
   return sqrt(distance) + prev_knot;
 }
 
-__attribute__((always_inline))
-static Vec2d interpolate(Vec2d start, Vec2d end, double start_knot,
-                         double end_knot, double t_value)
+__attribute__((always_inline)) static Vec2d interpolate(Vec2d start, Vec2d end,
+                                                        double start_knot,
+                                                        double end_knot,
+                                                        double t_value)
 {
   const double knot_diff = end_knot - start_knot;
 

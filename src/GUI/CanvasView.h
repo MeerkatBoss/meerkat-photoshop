@@ -47,6 +47,10 @@ public:
     {
       return;
     }
+    if (m_palette.getActiveTool().getWidget() != nullptr)
+    {
+      m_palette.getActiveTool().getWidget()->onEvent(event, context);
+    }
     Widget::onEvent(event, context);
   }
 
