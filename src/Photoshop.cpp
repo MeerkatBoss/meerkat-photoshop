@@ -47,7 +47,7 @@ Photoshop::Photoshop(size_t width, size_t height) :
 
   // m_editorState.getTools().addTool(new BrushTool(10));
   // m_editorState.newCanvas("Untitled.png", 1000, 1000);
-  m_editorState.openCanvas("mandelbrot.png");
+  m_editorState.openCanvas("poltorashka.jpg");
 
   s_logger.LOG_TRACE(ContentType::TEXT, "Created Photoshop instance");
 }

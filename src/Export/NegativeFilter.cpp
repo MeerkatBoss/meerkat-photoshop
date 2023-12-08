@@ -36,11 +36,15 @@ void NegativeFilter::applyFilter(plug::Canvas& canvas) const
   {
     for (size_t y = 0; y < height; ++y)
     {
-      const plug::Color color = canvas.getPixel(x, y);
-      canvas.setPixel(x, y,
-                      plug::Color(clampChannel(255 - color.red),
-                                  clampChannel(255 - color.green),
-                                  clampChannel(255 - color.blue), color.alpha));
+      if (canvas.getSelectionMask().getPixel(x, y))
+      {
+        const plug::Color color = canvas.getPixel(x, y);
+        canvas.setPixel(x, y,
+                        plug::Color(clampChannel(255 - color.red),
+                                    clampChannel(255 - color.green),
+                                    clampChannel(255 - color.blue),
+                                    color.alpha));
+      }
     }
   }
 }

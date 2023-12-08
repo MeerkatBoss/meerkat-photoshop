@@ -44,13 +44,17 @@ void PosterizeFilter::applyFilter(plug::Canvas& canvas) const
   {
     for (size_t y = 0; y < height; ++y)
     {
-      const plug::Color color = canvas.getPixel(x, y);
-      canvas.setPixel(
-          x, y,
-          plug::Color(posterizeChannel(color.red, m_colorLevelsCount),
-                      posterizeChannel(color.green, m_colorLevelsCount),
-                      posterizeChannel(color.blue, m_colorLevelsCount),
-                      color.alpha));
+      if (canvas.getSelectionMask().getPixel(x, y))
+      {
+        const plug::Color color = canvas.getPixel(x, y);
+        canvas.setPixel(
+            x, y,
+            plug::Color(posterizeChannel(color.red, m_colorLevelsCount),
+                        posterizeChannel(color.green, m_colorLevelsCount),
+                        posterizeChannel(color.blue, m_colorLevelsCount),
+                        color.alpha));
+        
+      }
     }
   }
 }

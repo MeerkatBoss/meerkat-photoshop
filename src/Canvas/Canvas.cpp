@@ -18,6 +18,7 @@ Canvas::Canvas(const char* name, size_t width, size_t height) :
     m_mask(width, height),
     m_rawTexture(new plug::Texture(width, height))
 {
+  m_mask.fill(true);
   m_renderTexture.create(width, height);
   m_renderTexture.clear(sf::Color::White);
   s_logger.LOG_DEBUG(Content::TEXT, "Created canvas '%s' %zux%zu at %p", name,
