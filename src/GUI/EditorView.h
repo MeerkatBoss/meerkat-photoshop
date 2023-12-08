@@ -31,7 +31,8 @@ public:
       m_editorState(editor_state),
       m_filterSelector(editor_state.getFilters(),
           layout::LayoutBox(5_cm, 50_per, layout::Align::TopRight)),
-      m_toolSelector(editor_state.getTools()),
+      m_toolSelector(editor_state.getTools(),
+          layout::LayoutBox(5_cm, 50_per, layout::Align::BottomRight)),
       m_colorSelector(
           editor_state.getColors(),
           layout::LayoutBox(5_cm, 100_per, layout::Align::CenterLeft)),

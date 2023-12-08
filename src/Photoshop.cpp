@@ -99,10 +99,6 @@ void Photoshop::runMainLoop(void)
   SfmlRenderTarget wrapped_rt(m_window);
   const sf::Color bg_color(50, 50, 50);
 
-  /* TODO: remove stub */
-  m_editorState.getTools().setActiveTool(
-      m_editorState.getTools().getToolCount() - 1);
-
   s_logger.LOG_TRACE(ContentType::TEXT, "Entering Photoshop main loop");
   while (m_window.isOpen())
   {

@@ -42,8 +42,6 @@ void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   const Vec2d texture_bl(0, text_height * 1.5);
   const Vec2d texture_br(text_width, text_height * 1.5);
 
-  stack.enter(Transform(getLayoutBox().getPosition()));
-
   plug::VertexArray array(plug::TriangleStrip, 4);
 
   array[0] = plug::Vertex{
@@ -69,8 +67,6 @@ void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
                           .tex_coords = texture_br,
                           .color      = plug::Color()};
   target.draw(array, texture);
-
-  stack.leave();
 }
 
 } // namespace gui
