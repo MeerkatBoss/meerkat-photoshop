@@ -4,6 +4,7 @@
 #include "Layout/LayoutBox.h"
 #include "Layout/Units.h"
 #include "Math.h"
+#include "Sprite/RectangleSprite.h"
 
 namespace gui
 {
@@ -11,6 +12,9 @@ namespace gui
 void ColorSelector::ColorRect::draw(plug::TransformStack& stack,
                                     plug::RenderTarget&   target)
 {
+  RectangleSprite sprite(m_color, 10);
+  sprite.draw(getLayoutBox(), stack, target);
+  /*
   auto [tl, tr, bl, br] = getRect(getLayoutBox());
   plug::VertexArray array(plug::TriangleStrip, 4);
 
@@ -23,6 +27,7 @@ void ColorSelector::ColorRect::draw(plug::TransformStack& stack,
   array[3] = plug::Vertex{
       .position = stack.apply(br), .tex_coords = Vec2d(), .color = m_color};
   target.draw(array);
+  */
 }
 
 ColorSelector::~ColorSelector(void)
@@ -76,10 +81,10 @@ void ColorSelector::onParentUpdate(const plug::LayoutBox& parent_box)
 void ColorSelector::addColor(plug::Color color)
 {
   const size_t selector_count = m_selectors.getSize();
-  const size_t length_mm      = 5 + 15 * selector_count;
+  const size_t length_mm      = 5 + 20 * selector_count;
 
   layout::LayoutBox box(
-      100_per, layout::Length(10 + length_mm, layout::Unit::Millimeter),
+      100_per, layout::Length(15 + length_mm, layout::Unit::Millimeter),
       layout::Align::BottomCenter);
 
   box.setPadding(0_px, layout::Length(length_mm, layout::Unit::Millimeter),
