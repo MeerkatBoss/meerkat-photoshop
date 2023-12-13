@@ -51,22 +51,22 @@ plug::Plugin* BaseTool::tryGetInterface(size_t interface_id)
 
   if (interface_id == size_t(plug::PluginGuid::Plugin))
   {
+    addReference();
+
     s_logger.LOG_TRACE(
         Content::TEXT,
         "Returned interface \"Plugin\" (GUID %zu) from tool \"%s\" (id %zu)",
         interface_id, m_data.getName(), m_toolId);
-
-    addReference();
     return this;
   }
   if (interface_id == size_t(plug::PluginGuid::Tool))
   {
+    addReference();
+
     s_logger.LOG_TRACE(
         Content::TEXT,
         "Returned interface \"Tool\" (GUID %zu) from tool \"%s\" (id %zu)",
         interface_id, m_data.getName(), m_toolId);
-
-    addReference();
     return this;
   }
 

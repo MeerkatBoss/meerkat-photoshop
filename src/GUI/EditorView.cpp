@@ -147,7 +147,7 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
 
   if (event.ctrl && event.key_id == plug::KeyCode::N)
   {
-    m_editorState.newCanvas(names[m_editorState.getCanvasCount()], 1000, 1000);
+    m_editorState.newCanvas(names[m_editorState.getCanvasCount()], 200, 200);
     addCanvasView(new CanvasView(m_editorState.getTools(),
                                  *m_editorState.getAllCanvases().back(),
                                  layout::LayoutBox(15_cm, 15_cm)));

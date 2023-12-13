@@ -45,22 +45,22 @@ plug::Plugin* BaseFilter::tryGetInterface(size_t interface_id)
 
   if (interface_id == size_t(plug::PluginGuid::Plugin))
   {
+    addReference();
+
     s_logger.LOG_TRACE(
         Content::TEXT,
         "Returned interface \"Plugin\" (GUID %zu) from filter \"%s\" (id %zu)",
         interface_id, m_data.getName(), m_filterId);
-
-    addReference();
     return this;
   }
   if (interface_id == size_t(plug::PluginGuid::Filter))
   {
+    addReference();
+
     s_logger.LOG_TRACE(
         Content::TEXT,
         "Returned interface \"Filter\" (GUID %zu) from filter \"%s\" (id %zu)",
         interface_id, m_data.getName(), m_filterId);
-
-    addReference();
     return this;
   }
 
