@@ -34,6 +34,7 @@ TextSprite::TextSprite(const TextSprite& other) :
     m_text(new char[other.m_textLen + 1]),
     m_textCapacity(other.m_textLen),
     m_textLen(other.m_textLen),
+    m_fontSize(other.m_fontSize),
     m_color(other.m_color)
 {
   strncpy(m_text, other.m_text, m_textLen);
@@ -122,13 +123,13 @@ void TextSprite::draw(const plug::LayoutBox& layout_box,
   render_texture.draw(text);
   render_texture.display();
 
-  static constexpr double margin_x = 0.03;
   static constexpr double margin_y = 0.3;
 
-  const double width  = text.getGlobalBounds().width;
+  const double width =
+      text.getGlobalBounds().width + text.getGlobalBounds().left;
   const double height = double(font_size);
 
-  const Vec2d text_size(min((1 + margin_x) * width, render_width),
+  const Vec2d text_size(min(width, render_width),
                         min((1 + margin_y) * height, render_height));
   const auto [tex_tl, tex_tr, tex_bl, tex_br] = getCornersFromSize(text_size);
 
