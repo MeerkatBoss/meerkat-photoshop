@@ -20,7 +20,7 @@ class PosterizeFilter : public BaseFilter
 {
 public:
   PosterizeFilter() :
-    BaseFilter("Posterize Filter", nullptr),
+    BaseFilter("Posterize", nullptr),
     m_colorLevelsCount(5)
   {
   }

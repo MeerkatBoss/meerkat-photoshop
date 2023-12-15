@@ -1,10 +1,12 @@
 #include "GUI/Titlebar.h"
 
 #include <SFML/Graphics/Text.hpp>
+#include <cstdio>
 
 #include "AssetManager.h"
 #include "Common/Math.h"
 #include "Impl/Util/Sfml.h"
+#include "Sprite/TextSprite.h"
 
 namespace gui
 {
@@ -14,6 +16,7 @@ void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   const plug::Color bg_color(70, 70, 80);
   const sf::Color   fg_color(240, 240, 240);
 
+  /*
   sf::Text text(m_name, AssetManager::getDefaultFont(),
                 getLayoutBox().getSize().y * 0.5);
   text.setFillColor(fg_color);
@@ -25,9 +28,11 @@ void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   sf::Image     image = m_renderTexture.getTexture().copyToImage();
   plug::Texture texture(image.getSize().x, image.getSize().y,
                         (const plug::Color*)image.getPixelsPtr());
+                        */
 
   const auto [tl, tr, bl, br] = getRect(getLayoutBox());
 
+  /*
   const double text_width  = text.getGlobalBounds().width * 1.1;
   const double text_height = text.getGlobalBounds().height;
   const double text_offset = (getLayoutBox().getSize().x - text_width) / 2;
@@ -41,6 +46,7 @@ void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   const Vec2d texture_tr(text_width, 0);
   const Vec2d texture_bl(0, text_height * 1.5);
   const Vec2d texture_br(text_width, text_height * 1.5);
+  */
 
   plug::VertexArray array(plug::TriangleStrip, 4);
 
@@ -53,6 +59,12 @@ void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
   array[3] = plug::Vertex{
       .position = stack.apply(br), .tex_coords = Vec2d(), .color = bg_color};
   target.draw(array);
+
+  TextSprite sprite(m_name, 0.9 * getLayoutBox().getSize().y,
+                    getPlugColor(fg_color));
+  sprite.draw(getLayoutBox(), stack, target);
+
+  /*
 
   array[0] = plug::Vertex{.position   = stack.apply(text_tl),
                           .tex_coords = texture_tl,
@@ -67,6 +79,7 @@ void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
                           .tex_coords = texture_br,
                           .color      = plug::Color()};
   target.draw(array, texture);
+  */
 }
 
 } // namespace gui
