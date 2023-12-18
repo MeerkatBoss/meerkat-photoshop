@@ -1,6 +1,7 @@
 #include "Common/Sprite/RectangleSprite.h"
 
 #include <cmath>
+#include <cstdio>
 
 #include "Common/Math.h"
 

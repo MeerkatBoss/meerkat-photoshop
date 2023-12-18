@@ -140,7 +140,6 @@ void TextSprite::draw(const plug::LayoutBox& layout_box,
   const Vec2d  display_size   = text_scale * max_size;
   const auto [tl, tr, bl, br] = getCornersFromSize(display_size);
 
-  // FIXME
   Vec2d offset = Vec2d();
   if (m_alignment == TextAlign::Left)
   {

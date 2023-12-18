@@ -24,6 +24,8 @@ public:
 
   void addLayer(const Sprite& sprite);
 
+  void clear(void);
+
   virtual void draw(const plug::LayoutBox& layout_box,
                     plug::TransformStack&  stack,
                     plug::RenderTarget&    target) const override;

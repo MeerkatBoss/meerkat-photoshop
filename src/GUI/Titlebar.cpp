@@ -4,25 +4,44 @@
 #include <cstdio>
 
 #include "AssetManager.h"
+#include "GUI/Widget.h"
 #include "Impl/Util/Sfml.h"
 #include "Math.h"
 #include "Sprite/CompositeSprite.h"
 #include "Sprite/RectangleSprite.h"
 #include "Sprite/TextSprite.h"
 
+static const plug::Color bg_color(70, 70, 80);
+static const plug::Color fg_color(240, 240, 240);
+
 namespace gui
 {
 
+Titlebar::Titlebar(const char* name, const plug::LayoutBox& layout_box) :
+    Widget(layout_box), m_name(name), m_sprite()
+{
+  setName(m_name);
+  /*
+  m_sprite.addLayer(RectangleSprite(bg_color, 0));
+  m_sprite.addLayer(TextSprite(m_name, 0.9 * getLayoutBox().getSize().y,
+                               fg_color, TextAlign::Center));
+                               */
+}
+
+void Titlebar::setName(const char* name)
+{
+  m_name = name;
+
+  m_sprite.clear();
+  m_sprite.addLayer(RectangleSprite(bg_color, 0));
+  m_sprite.addLayer(TextSprite(m_name, 0.9 * getLayoutBox().getSize().y,
+                               fg_color, TextAlign::Center));
+}
+
 void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 {
-  const plug::Color bg_color(70, 70, 80);
-  const plug::Color fg_color(240, 240, 240);
-
-  CompositeSprite sprite;
-  sprite.addLayer(RectangleSprite(bg_color, 0));
-  sprite.addLayer(TextSprite(m_name, 0.9 * getLayoutBox().getSize().y, fg_color,
-                             TextAlign::Center));
-  sprite.draw(getLayoutBox(), stack, target);
+  Widget::draw(stack, target);
+  m_sprite.draw(getLayoutBox(), stack, target);
 }
 
 } // namespace gui
