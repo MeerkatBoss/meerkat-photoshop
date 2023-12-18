@@ -14,12 +14,13 @@
 #include "Impl/Util/Sfml.h"
 
 TextSprite::TextSprite(const char* text, unsigned font_size,
-                       plug::Color text_color) :
+                       plug::Color text_color, TextAlign align) :
     m_text(nullptr),
     m_textCapacity(0),
     m_textLen(0),
     m_fontSize(font_size),
-    m_color(text_color)
+    m_color(text_color),
+    m_alignment(align)
 {
   const size_t text_len = strnlen(text, MAX_TEXT_LEN);
   m_text                = new char[text_len + 1];
@@ -35,7 +36,8 @@ TextSprite::TextSprite(const TextSprite& other) :
     m_textCapacity(other.m_textLen),
     m_textLen(other.m_textLen),
     m_fontSize(other.m_fontSize),
-    m_color(other.m_color)
+    m_color(other.m_color),
+    m_alignment(other.m_alignment)
 {
   strncpy(m_text, other.m_text, m_textLen);
   m_text[m_textLen] = '\0';
@@ -138,7 +140,20 @@ void TextSprite::draw(const plug::LayoutBox& layout_box,
   const Vec2d  display_size   = text_scale * max_size;
   const auto [tl, tr, bl, br] = getCornersFromSize(display_size);
 
-  const Vec2d offset = (layout_box.getSize() - display_size) / 2;
+  // FIXME
+  Vec2d offset = Vec2d();
+  if (m_alignment == TextAlign::Left)
+  {
+    offset = Vec2d(0, 0);
+  }
+  else if (m_alignment == TextAlign::Center)
+  {
+    offset = (layout_box.getSize() - display_size) / 2;
+  }
+  else
+  {
+    offset = layout_box.getSize() - display_size;
+  }
 
   stack.enter(Transform(layout_box.getPosition() + offset));
 

@@ -14,10 +14,18 @@
 
 #include "Common/Sprite/Sprite.h"
 
+enum class TextAlign
+{
+  Left,
+  Center,
+  Right
+};
+
 class TextSprite : public Sprite
 {
 public:
-  TextSprite(const char* text, unsigned font_size, plug::Color text_color);
+  TextSprite(const char* text, unsigned font_size, plug::Color text_color,
+             TextAlign align = TextAlign::Center);
 
   TextSprite(const TextSprite& other);
 
@@ -46,8 +54,9 @@ private:
   size_t m_textCapacity;
   size_t m_textLen;
 
-  unsigned m_fontSize;
+  unsigned    m_fontSize;
   plug::Color m_color;
+  TextAlign   m_alignment;
 };
 
 #endif /* TextSprite.h */

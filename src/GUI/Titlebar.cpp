@@ -20,8 +20,8 @@ void Titlebar::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 
   CompositeSprite sprite;
   sprite.addLayer(RectangleSprite(bg_color, 0));
-  sprite.addLayer(
-      TextSprite(m_name, 0.9 * getLayoutBox().getSize().y, fg_color));
+  sprite.addLayer(TextSprite(m_name, 0.9 * getLayoutBox().getSize().y, fg_color,
+                             TextAlign::Center));
   sprite.draw(getLayoutBox(), stack, target);
 }
 
