@@ -108,7 +108,7 @@ void FilterSelector::onMousePressed(const plug::MousePressedEvent& event,
     {
       if (m_options[i]->covers(context.stack, event.pos))
       {
-        m_selected = m_options[i]->getFilter();
+        m_selected           = m_options[i]->getFilter();
         plug::Widget* widget = m_selected->getWidget();
         if (widget != nullptr)
         {
@@ -156,14 +156,18 @@ void FilterSelector::onParentUpdate(const plug::LayoutBox& parent_box)
 void FilterSelector::addFilterOption(plug::Filter* filter)
 {
   const size_t option_count = m_options.getSize();
-  const size_t length_mm    = 5 + 15 * option_count;
+  const size_t padding_mm   = 5;
+  const size_t height_mm    = 10;
+  const size_t full_padding_mm =
+      padding_mm + (height_mm + padding_mm) * option_count;
 
   layout::LayoutBox box(
-      100_per, layout::Length(10 + length_mm, layout::Unit::Millimeter),
+      100_per,
+      layout::Length(height_mm + full_padding_mm, layout::Unit::Millimeter),
       layout::Align::TopCenter);
 
-  box.setPadding(layout::Length(length_mm, layout::Unit::Millimeter), 0_px,
-                 5_mm, 5_mm);
+  box.setPadding(layout::Length(full_padding_mm, layout::Unit::Millimeter),
+                 0_px, 5_mm, 5_mm);
 
   m_options.pushBack(new FilterOption(filter, box));
   m_options.back()->onParentUpdate(getLayoutBox());

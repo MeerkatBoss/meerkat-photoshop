@@ -79,7 +79,7 @@ private:
 };
 
 BrushTool::BrushTool(double radius) :
-    BaseTool("Brush Tool", nullptr),
+    BaseTool("Brush", nullptr),
     m_radius(radius),
     m_isDrawing(false),
     m_lastPos(),

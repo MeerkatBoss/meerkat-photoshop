@@ -20,7 +20,7 @@ class NegativeFilter : public BaseFilter
 {
 public:
   NegativeFilter() :
-    BaseFilter("Negative Filter", nullptr)
+    BaseFilter("Negative", nullptr)
   {
   }
 

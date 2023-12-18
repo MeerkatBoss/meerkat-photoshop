@@ -14,7 +14,7 @@ const sf::Font& AssetManager::getDefaultFont(void)
   if (s_isFontLoaded)
     return s_defaultFont;
 
-  bool success = s_defaultFont.loadFromFile("assets/Roboto-Regular.ttf");
+  bool success = s_defaultFont.loadFromFile("assets/RobotoMono-Regular.ttf");
   assert(success);
   s_isFontLoaded = true;
 
