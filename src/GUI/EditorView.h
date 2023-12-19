@@ -18,6 +18,7 @@
 #include "GUI/CanvasView.h"
 #include "GUI/ColorSelector.h"
 #include "GUI/FilterSelector.h"
+#include "GUI/TextField.h"
 #include "GUI/ToolSelector.h"
 
 namespace gui
@@ -34,6 +35,10 @@ public:
     for (size_t i = 0; i < view_count; ++i)
     {
       delete m_views[i];
+    }
+    if (m_textField != nullptr)
+    {
+      delete m_textField;
     }
   }
 
@@ -55,13 +60,17 @@ protected:
                                  plug::EHC& context) override;
 
 private:
+  void closePending(void);
+
   EditorState& m_editorState;
 
+  TextField*            m_textField;
   FilterSelector        m_filterSelector;
   ToolSelector          m_toolSelector;
   ColorSelector         m_colorSelector;
   DynArray<CanvasView*> m_views;
   CanvasView*           m_activeView;
+  CanvasView*           m_pendingClose;
   size_t                m_activeViewIdx;
 };
 

@@ -74,6 +74,9 @@ protected:
   virtual void onKeyboardReleased(const plug::KeyboardReleasedEvent& event,
                                   plug::EHC& context) override;
 
+  virtual void onTick(const plug::TickEvent& event,
+                      plug::EHC&             context) override;
+
 private:
   plug::Transform getCanvasTransform(void) const;
 

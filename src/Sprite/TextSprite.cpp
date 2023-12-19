@@ -140,20 +140,21 @@ void TextSprite::draw(const plug::LayoutBox& layout_box,
   const Vec2d  display_size   = text_scale * max_size;
   const auto [tl, tr, bl, br] = getCornersFromSize(display_size);
 
-  Vec2d offset = Vec2d();
+  double offset_x = 0;
   if (m_alignment == TextAlign::Left)
   {
-    offset = Vec2d(0, 0);
+    offset_x = 0;
   }
   else if (m_alignment == TextAlign::Center)
   {
-    offset = (layout_box.getSize() - display_size) / 2;
+    offset_x = (layout_box.getSize().x - display_size.x) / 2;
   }
   else
   {
-    offset = layout_box.getSize() - display_size;
+    offset_x = layout_box.getSize().x - display_size.x;
   }
 
+  const Vec2d offset(offset_x, (layout_box.getSize().y - display_size.y) / 2);
   stack.enter(Transform(layout_box.getPosition() + offset));
 
   plug::VertexArray array(plug::TriangleStrip, 4);

@@ -3,6 +3,7 @@
 #include "Common/GUI/Widget.h"
 #include "DynArray.h"
 #include "GUI/CanvasView.h"
+#include "GUI/TextField.h"
 #include "Layout/LayoutBox.h"
 #include "Math.h"
 
@@ -13,6 +14,7 @@ EditorView::EditorView(EditorState&           editor_state,
                        const plug::LayoutBox& layout_box) :
     Widget(layout_box),
     m_editorState(editor_state),
+    m_textField(nullptr),
     m_filterSelector(editor_state.getFilters(),
                      layout::LayoutBox(5_cm, 50_per, layout::Align::TopRight)),
     m_toolSelector(editor_state.getTools(),
@@ -21,7 +23,8 @@ EditorView::EditorView(EditorState&           editor_state,
         editor_state.getColors(),
         layout::LayoutBox(5_cm, 100_per, layout::Align::CenterLeft)),
     m_views(),
-    m_activeView(nullptr)
+    m_activeView(nullptr),
+    m_pendingClose(nullptr)
 {
   m_colorSelector.addColor(plug::Color(0, 0, 0));
   m_colorSelector.addColor(plug::Color(255, 0, 0));
@@ -100,6 +103,11 @@ void EditorView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 
   m_filterSelector.draw(stack, target);
 
+  if (m_textField != nullptr)
+  {
+    m_textField->draw(stack, target);
+  }
+
   stack.leave();
 }
 
@@ -108,6 +116,13 @@ void EditorView::onEvent(const plug::Event& event, plug::EHC& context)
   Widget::onEvent(event, context);
 
   context.stack.enter(Transform(getLayoutBox().getPosition()));
+
+  if (m_textField != nullptr)
+  {
+    m_textField->onEvent(event, context);
+    context.stack.leave();
+    return;
+  }
 
   m_filterSelector.onEvent(event, context);
 
@@ -135,6 +150,10 @@ void EditorView::onEvent(const plug::Event& event, plug::EHC& context)
 void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
 {
   getLayoutBox().onParentUpdate(parent_box);
+  if (m_textField != nullptr)
+  {
+    m_textField->onParentUpdate(getLayoutBox());
+  }
   m_filterSelector.onParentUpdate(getLayoutBox());
   m_toolSelector.onParentUpdate(getLayoutBox());
   m_colorSelector.onParentUpdate(getLayoutBox());
@@ -146,7 +165,7 @@ void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
   }
 }
 
-template<typename T>
+template <typename T>
 static void pruneArray(DynArray<T*>& array)
 {
   while (!array.isEmpty() && array.back() == nullptr)
@@ -166,33 +185,50 @@ static void pruneArray(DynArray<T*>& array)
   }
 }
 
+void EditorView::closePending(void)
+{
+  if (m_pendingClose == nullptr)
+  {
+    return;
+  }
+
+  bool isActiveViewClosed = (m_pendingClose == m_activeView);
+
+  const size_t view_count = m_views.getSize();
+  for (size_t i = 0; i < view_count; ++i)
+  {
+    if (m_views[i] == m_pendingClose)
+    {
+      delete m_views[i];
+      m_views[i] = nullptr;
+      break;
+    }
+  }
+  pruneArray(m_views);
+
+  if (isActiveViewClosed)
+  {
+    m_activeView = m_views.getSize() > 0 ? m_views[0] : nullptr;
+  }
+}
+
 void EditorView::onTick(const plug::TickEvent&, plug::EHC&)
 {
-  bool isActiveViewClosed = false;
   const size_t view_count = m_views.getSize();
   for (size_t i = 0; i < view_count; ++i)
   {
     if (m_views[i]->isClosed())
     {
-      if (m_views[i] == m_activeView)
+      if (m_pendingClose == nullptr)
       {
-        isActiveViewClosed = true;
+        m_pendingClose = m_views[i];
+        m_textField    = new TextField(
+            "Enter new file name", m_pendingClose->getCanvas().getName(),
+            layout::LayoutBox(20_cm, 6_cm, layout::Align::Center));
+        m_textField->onParentUpdate(getLayoutBox());
       }
-      m_editorState.saveCanvas(&m_views[i]->getCanvas());
-
-      delete m_views[i];
-      m_views[i] = nullptr;
+      m_views[i]->stayOpen();
     }
-  }
-
-  pruneArray(m_views);
-  if (isActiveViewClosed)
-  {
-    if (m_views.getSize() > 0)
-    {
-      m_activeView = m_views[0];
-    }
-    m_activeView = nullptr;
   }
 }
 
@@ -206,8 +242,37 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
     return;
   }
 
+  if (m_textField != nullptr)
+  {
+    if (event.key_id == plug::KeyCode::Enter)
+    {
+      context.stopped = true;
+      if (m_pendingClose != nullptr)
+      {
+        m_pendingClose->getCanvas().setName(m_textField->getText());
+        m_editorState.saveCanvas(&m_pendingClose->getCanvas());
+        closePending();
+      }
+      else
+      {
+        m_activeView->getCanvas().setName(m_textField->getText());
+      }
+      delete m_textField;
+      m_textField = nullptr;
+    }
+    else if (event.key_id == plug::KeyCode::Escape)
+    {
+      context.stopped = true;
+      m_pendingClose  = nullptr;
+      delete m_textField;
+      m_textField = nullptr;
+    }
+    return;
+  }
+
   if (event.ctrl && event.key_id == plug::KeyCode::F)
   {
+    context.stopped             = true;
     plug::Canvas* active_canvas = m_editorState.getActiveCanvas();
     if (active_canvas != nullptr && m_editorState.getFilters().hasLastFilter())
     {
@@ -222,14 +287,28 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
 
   if (event.ctrl && event.key_id == plug::KeyCode::N)
   {
+    context.stopped = true;
     m_editorState.newCanvas(names[m_editorState.getCanvasCount()], 500, 500);
     addCanvasView(new CanvasView(m_editorState.getTools(),
                                  *m_editorState.getAllCanvases().back(),
                                  layout::LayoutBox(15_cm, 15_cm)));
   }
 
+  if (event.ctrl && event.key_id == plug::KeyCode::S)
+  {
+    if (m_activeView != nullptr)
+    {
+      context.stopped = true;
+      m_textField    = new TextField(
+          "Enter new file name", m_activeView->getCanvas().getName(),
+          layout::LayoutBox(20_cm, 6_cm, layout::Align::Center));
+      m_textField->onParentUpdate(getLayoutBox());
+    }
+  }
+
   if (event.key_id == plug::KeyCode::Tab)
   {
+    context.stopped = true;
     if (m_views.getSize() == 0)
     {
       return;
@@ -241,6 +320,7 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
 
   if (event.key_id == plug::KeyCode::Enter)
   {
+    context.stopped             = true;
     plug::Filter* selected      = m_filterSelector.getSelectedFilter();
     plug::Canvas* active_canvas = m_editorState.getActiveCanvas();
 
@@ -262,6 +342,7 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
 
   if (event.key_id == plug::KeyCode::Escape)
   {
+    context.stopped = true;
     m_filterSelector.deselect();
   }
 }

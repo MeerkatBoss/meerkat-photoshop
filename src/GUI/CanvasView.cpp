@@ -1,6 +1,7 @@
 #include "GUI/CanvasView.h"
 
 #include <cstdio>
+#include <cstring>
 
 #include "Common/GUI/Widget.h"
 
@@ -270,6 +271,14 @@ void CanvasView::onKeyboardReleased(const plug::KeyboardReleasedEvent& event,
       event.key_id == plug::KeyCode::RAlt)
   {
     m_palette.getActiveTool().onModifier3({plug::State::Released});
+  }
+}
+
+void CanvasView::onTick(const plug::TickEvent&, plug::EHC&)
+{
+  if (strcmp(m_titlebar.getName(), m_canvas.getName()) != 0)
+  {
+    m_titlebar.setName(m_canvas.getName());
   }
 }
 

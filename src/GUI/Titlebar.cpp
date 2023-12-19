@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics/Text.hpp>
 #include <cstdio>
+#include <cstring>
 
 #include "AssetManager.h"
 #include "GUI/Widget.h"
@@ -18,9 +19,9 @@ namespace gui
 {
 
 Titlebar::Titlebar(const char* name, const plug::LayoutBox& layout_box) :
-    Widget(layout_box), m_name(name), m_sprite()
+    Widget(layout_box), m_name(nullptr), m_sprite()
 {
-  setName(m_name);
+  setName(name);
   /*
   m_sprite.addLayer(RectangleSprite(bg_color, 0));
   m_sprite.addLayer(TextSprite(m_name, 0.9 * getLayoutBox().getSize().y,
@@ -30,7 +31,10 @@ Titlebar::Titlebar(const char* name, const plug::LayoutBox& layout_box) :
 
 void Titlebar::setName(const char* name)
 {
-  m_name = name;
+  const size_t name_len = strlen(name);
+  m_name = new char[name_len + 1];
+  strncpy(m_name, name, name_len);
+  m_name[name_len] = '\0';
 
   m_sprite.clear();
   m_sprite.addLayer(RectangleSprite(bg_color, 0));

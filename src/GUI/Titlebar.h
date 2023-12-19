@@ -25,10 +25,14 @@ class Titlebar : public Widget
 public:
   Titlebar(const char* name, const plug::LayoutBox& layout_box);
 
+  virtual ~Titlebar(void) override { delete[] m_name; }
+
   virtual void draw(plug::TransformStack& stack,
                     plug::RenderTarget&   target) override;
 
   void setName(const char* name);
+
+  const char* getName(void) const { return m_name; }
 
   virtual void onParentUpdate(const plug::LayoutBox& parent_box) override
   {
@@ -37,7 +41,7 @@ public:
   }
 
 private:
-  const char*       m_name;
+  char* m_name;
 
   CompositeSprite m_sprite;
 };
