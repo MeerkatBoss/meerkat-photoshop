@@ -29,10 +29,12 @@ public:
       Widget(layout_box),
       m_titlebar(canvas.getName(), layout::LayoutBox(100_per, 1_cm)),
       m_palette(palette),
+      m_canvasLayoutBox(100_per, 100_per, layout::Align::BottomCenter),
       m_canvas(canvas),
       m_isMoving(false),
       m_isFocused(false)
   {
+    m_canvasLayoutBox.setPadding(1_cm, 0_px, 0_px, 0_px);
   }
 
   void focus(void) { m_isFocused = true; }
@@ -61,6 +63,7 @@ public:
   {
     Widget::onParentUpdate(parent_box);
     m_titlebar.onParentUpdate(getLayoutBox());
+    m_canvasLayoutBox.onParentUpdate(getLayoutBox());
   }
 
 protected:
@@ -85,11 +88,14 @@ private:
   Titlebar m_titlebar;
 
   ToolPalette& m_palette;
-  Canvas&      m_canvas;
-  bool         m_isMoving;
-  Vec2d        m_lastPos;
 
-  bool m_isFocused;
+  layout::LayoutBox m_canvasLayoutBox;
+  Canvas&           m_canvas;
+
+  bool  m_isMoving;
+  Vec2d m_lastPos;
+
+  bool  m_isFocused;
 };
 
 } // namespace gui
