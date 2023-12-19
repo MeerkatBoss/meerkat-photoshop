@@ -22,9 +22,11 @@ EditorView::EditorView(EditorState&           editor_state,
     m_colorSelector(
         editor_state.getColors(),
         layout::LayoutBox(5_cm, 100_per, layout::Align::CenterLeft)),
-    m_views(),
     m_activeView(nullptr),
-    m_pendingClose(nullptr)
+    m_activeViewIdx(0),
+    m_views(),
+    m_pendingClose(nullptr),
+    m_hasPendingOpen(false)
 {
   m_colorSelector.addColor(plug::Color(0, 0, 0));
   m_colorSelector.addColor(plug::Color(255, 0, 0));
@@ -235,8 +237,6 @@ void EditorView::onTick(const plug::TickEvent&, plug::EHC&)
 void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
                                    plug::EHC&                        context)
 {
-  /* TODO: Allow creating and opening canvases with hotkeys and menus */
-
   if (context.stopped)
   {
     return;
@@ -252,6 +252,14 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
         m_pendingClose->getCanvas().setName(m_textField->getText());
         m_editorState.saveCanvas(&m_pendingClose->getCanvas());
         closePending();
+      }
+      else if (m_hasPendingOpen)
+      {
+        m_editorState.openCanvas(m_textField->getText());
+        addCanvasView(new CanvasView(m_editorState.getTools(),
+                                     *m_editorState.getAllCanvases().back(),
+                                     layout::LayoutBox(15_cm, 15_cm)));
+        m_hasPendingOpen = false;
       }
       else
       {
@@ -284,6 +292,16 @@ void EditorView::onKeyboardPressed(const plug::KeyboardPressedEvent& event,
       "Unknown.png",   "Unknown_1.png", "Unknown_2.png", "Unknown_3.png",
       "Unknown_4.png", "Unknown_5.png", "Unknown_6.png", "Unknown_7.png",
       "Unknown_8.png", "Unknown_9.png"};
+
+  if (event.ctrl && event.key_id == plug::KeyCode::O)
+  {
+    context.stopped = true;
+    m_textField    = new TextField(
+        "Enter name of file to open", "",
+        layout::LayoutBox(20_cm, 6_cm, layout::Align::Center));
+    m_textField->onParentUpdate(getLayoutBox());
+    m_hasPendingOpen = true;
+  }
 
   if (event.ctrl && event.key_id == plug::KeyCode::N)
   {

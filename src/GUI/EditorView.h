@@ -65,13 +65,18 @@ private:
   EditorState& m_editorState;
 
   TextField*            m_textField;
+
   FilterSelector        m_filterSelector;
   ToolSelector          m_toolSelector;
   ColorSelector         m_colorSelector;
-  DynArray<CanvasView*> m_views;
+
   CanvasView*           m_activeView;
-  CanvasView*           m_pendingClose;
   size_t                m_activeViewIdx;
+
+  DynArray<CanvasView*> m_views;
+
+  CanvasView*           m_pendingClose;
+  bool                  m_hasPendingOpen;
 };
 
 } // namespace gui
