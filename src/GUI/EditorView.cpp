@@ -1,12 +1,37 @@
 #include "GUI/EditorView.h"
 
 #include "Common/GUI/Widget.h"
+#include "DynArray.h"
 #include "GUI/CanvasView.h"
 #include "Layout/LayoutBox.h"
 #include "Math.h"
 
 namespace gui
 {
+
+EditorView::EditorView(EditorState&           editor_state,
+                       const plug::LayoutBox& layout_box) :
+    Widget(layout_box),
+    m_editorState(editor_state),
+    m_filterSelector(editor_state.getFilters(),
+                     layout::LayoutBox(5_cm, 50_per, layout::Align::TopRight)),
+    m_toolSelector(editor_state.getTools(),
+                   layout::LayoutBox(5_cm, 50_per, layout::Align::BottomRight)),
+    m_colorSelector(
+        editor_state.getColors(),
+        layout::LayoutBox(5_cm, 100_per, layout::Align::CenterLeft)),
+    m_views(),
+    m_activeView(nullptr)
+{
+  m_colorSelector.addColor(plug::Color(0, 0, 0));
+  m_colorSelector.addColor(plug::Color(255, 0, 0));
+  m_colorSelector.addColor(plug::Color(0, 255, 0));
+  m_colorSelector.addColor(plug::Color(0, 0, 255));
+  m_colorSelector.addColor(plug::Color(255, 255, 0));
+  m_colorSelector.addColor(plug::Color(255, 0, 255));
+  m_colorSelector.addColor(plug::Color(0, 255, 255));
+  m_colorSelector.addColor(plug::Color(255, 255, 255));
+}
 
 void EditorView::addCanvasView(CanvasView* canvas_view)
 {
@@ -118,6 +143,54 @@ void EditorView::onParentUpdate(const plug::LayoutBox& parent_box)
   for (size_t i = 0; i < view_count; ++i)
   {
     m_views[i]->onParentUpdate(getLayoutBox());
+  }
+}
+
+template<typename T>
+static void pruneArray(DynArray<T*>& array)
+{
+  while (!array.isEmpty() && array.back() == nullptr)
+  {
+    array.popBack();
+  }
+
+  size_t it = 0;
+  while (it < array.getSize())
+  {
+    if (array[it] == nullptr)
+    {
+      array[it] = array.back();
+      array.popBack();
+    }
+    ++it;
+  }
+}
+
+void EditorView::onTick(const plug::TickEvent&, plug::EHC&)
+{
+  bool isActiveViewClosed = false;
+  const size_t view_count = m_views.getSize();
+  for (size_t i = 0; i < view_count; ++i)
+  {
+    if (m_views[i]->isClosed())
+    {
+      if (m_views[i] == m_activeView)
+      {
+        isActiveViewClosed = true;
+      }
+      delete m_views[i];
+      m_views[i] = nullptr;
+    }
+  }
+
+  pruneArray(m_views);
+  if (isActiveViewClosed)
+  {
+    if (m_views.getSize() > 0)
+    {
+      m_activeView = m_views[0];
+    }
+    m_activeView = nullptr;
   }
 }
 

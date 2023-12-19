@@ -1,9 +1,43 @@
 #include "GUI/CanvasView.h"
 
+#include <cstdio>
+
 #include "Common/GUI/Widget.h"
 
 namespace gui
 {
+
+CanvasView::CanvasView(ToolPalette& palette, Canvas& canvas,
+                       const plug::LayoutBox& layout_box) :
+    Widget(layout_box),
+    m_titlebar(canvas.getName(), layout::LayoutBox(100_per, 1_cm)),
+    m_closeButton(RectangleSprite(plug::Color(200, 50, 50), 0), *this,
+                  layout::LayoutBox(1_cm, 1_cm, layout::Align::TopRight)),
+    m_palette(palette),
+    m_canvasLayoutBox(100_per, 100_per, layout::Align::BottomCenter),
+    m_canvas(canvas),
+    m_isMoving(false),
+    m_isFocused(false),
+    m_isClosed(false)
+{
+  m_canvasLayoutBox.setPadding(1_cm, 0_px, 0_px, 0_px);
+}
+
+void CanvasView::onEvent(const plug::Event& event, plug::EHC& context)
+{
+  context.stack.enter(Transform(getLayoutBox().getPosition()));
+  m_closeButton.onEvent(event, context);
+  context.stack.leave();
+  if (!m_isFocused)
+  {
+    return;
+  }
+  if (m_palette.getActiveTool().getWidget() != nullptr)
+  {
+    m_palette.getActiveTool().getWidget()->onEvent(event, context);
+  }
+  Widget::onEvent(event, context);
+}
 
 void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 {
@@ -76,6 +110,7 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 
   stack.enter(Transform(getLayoutBox().getPosition()));
   m_titlebar.draw(stack, target);
+  m_closeButton.draw(stack, target);
   stack.leave();
 }
 
@@ -252,7 +287,8 @@ plug::Transform CanvasView::getCanvasTransform(void) const
   const Vec2d offset =
       (m_canvasLayoutBox.getSize() - scale * m_canvas.getSize()) / 2;
 
-  return Transform(getLayoutBox().getPosition() + m_canvasLayoutBox.getPosition() + offset,
+  return Transform(getLayoutBox().getPosition() +
+                       m_canvasLayoutBox.getPosition() + offset,
                    Vec2d(scale, scale));
 }
 

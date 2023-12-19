@@ -26,28 +26,7 @@ namespace gui
 class EditorView : public Widget
 {
 public:
-  EditorView(EditorState& editor_state, const plug::LayoutBox& layout_box) :
-      Widget(layout_box),
-      m_editorState(editor_state),
-      m_filterSelector(editor_state.getFilters(),
-          layout::LayoutBox(5_cm, 50_per, layout::Align::TopRight)),
-      m_toolSelector(editor_state.getTools(),
-          layout::LayoutBox(5_cm, 50_per, layout::Align::BottomRight)),
-      m_colorSelector(
-          editor_state.getColors(),
-          layout::LayoutBox(5_cm, 100_per, layout::Align::CenterLeft)),
-      m_views(),
-      m_activeView(nullptr)
-  {
-    m_colorSelector.addColor(plug::Color(0, 0, 0));
-    m_colorSelector.addColor(plug::Color(255, 0, 0));
-    m_colorSelector.addColor(plug::Color(0, 255, 0));
-    m_colorSelector.addColor(plug::Color(0, 0, 255));
-    m_colorSelector.addColor(plug::Color(255, 255, 0));
-    m_colorSelector.addColor(plug::Color(255, 0, 255));
-    m_colorSelector.addColor(plug::Color(0, 255, 255));
-    m_colorSelector.addColor(plug::Color(255, 255, 255));
-  }
+  EditorView(EditorState& editor_state, const plug::LayoutBox& layout_box);
 
   virtual ~EditorView(void) override
   {
@@ -69,7 +48,8 @@ public:
   void onParentUpdate(const plug::LayoutBox& parent_box) override;
 
 protected:
-  /* TODO: Allow creating and opening canvases with hotkeys and menus */
+  virtual void onTick(const plug::TickEvent& event,
+                      plug::EHC&             context) override;
 
   virtual void onKeyboardPressed(const plug::KeyboardPressedEvent& event,
                                  plug::EHC& context) override;
