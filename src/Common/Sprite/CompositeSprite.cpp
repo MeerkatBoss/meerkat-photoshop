@@ -4,16 +4,22 @@
 
 CompositeSprite::~CompositeSprite(void)
 {
-  const size_t sprite_count = m_sprites.getSize();
-  for (size_t i = 0; i < sprite_count; ++i)
-  {
-    delete m_sprites[i];
-  }
+  clear();
 }
 
 void CompositeSprite::addLayer(const Sprite& sprite)
 {
   m_sprites.pushBack(sprite.clone());
+}
+
+void CompositeSprite::clear(void)
+{
+  const size_t sprite_count = m_sprites.getSize();
+  for (size_t i = 0; i < sprite_count; ++i)
+  {
+    delete m_sprites[i];
+  }
+  m_sprites.clear();
 }
 
 void CompositeSprite::draw(const plug::LayoutBox& layout_box,

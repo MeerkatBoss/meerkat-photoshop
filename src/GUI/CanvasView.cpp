@@ -1,16 +1,51 @@
 #include "GUI/CanvasView.h"
 
+#include <cstdio>
+#include <cstring>
+
 #include "Common/GUI/Widget.h"
 
 namespace gui
 {
+
+CanvasView::CanvasView(ToolPalette& palette, Canvas& canvas,
+                       const plug::LayoutBox& layout_box) :
+    Widget(layout_box),
+    m_titlebar(canvas.getName(), layout::LayoutBox(100_per, 1_cm)),
+    m_closeButton(RectangleSprite(plug::Color(200, 50, 50), 0), *this,
+                  layout::LayoutBox(1_cm, 1_cm, layout::Align::TopRight)),
+    m_palette(palette),
+    m_canvasLayoutBox(100_per, 100_per, layout::Align::BottomCenter),
+    m_canvas(canvas),
+    m_isMoving(false),
+    m_isFocused(false),
+    m_isClosed(false)
+{
+  m_canvasLayoutBox.setPadding(1_cm, 0_px, 0_px, 0_px);
+}
+
+void CanvasView::onEvent(const plug::Event& event, plug::EHC& context)
+{
+  context.stack.enter(Transform(getLayoutBox().getPosition()));
+  m_closeButton.onEvent(event, context);
+  context.stack.leave();
+  if (!m_isFocused)
+  {
+    return;
+  }
+  if (m_palette.getActiveTool().getWidget() != nullptr)
+  {
+    m_palette.getActiveTool().getWidget()->onEvent(event, context);
+  }
+  Widget::onEvent(event, context);
+}
 
 void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 {
   using plug::Vec2d;
   using plug::Vertex;
 
-  const plug::Color bg_color(40, 40, 45);
+  const plug::Color bg_color(100, 100, 100);
 
   plug::VertexArray array(plug::TriangleStrip, 4);
 
@@ -37,6 +72,19 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
     target.draw(array);
   }
 
+  const auto [tl, tr, bl, br] = getRect(getLayoutBox());
+
+  // Draw background
+  array[0] = Vertex{
+      .position = stack.apply(tl), .tex_coords = Vec2d(), .color = bg_color};
+  array[1] = Vertex{
+      .position = stack.apply(tr), .tex_coords = Vec2d(), .color = bg_color};
+  array[2] = Vertex{
+      .position = stack.apply(bl), .tex_coords = Vec2d(), .color = bg_color};
+  array[3] = Vertex{
+      .position = stack.apply(br), .tex_coords = Vec2d(), .color = bg_color};
+  target.draw(array);
+
   const Vec2d canvas_size = m_canvas.getSize();
 
   const Vec2d tex_tl(0, 0);
@@ -46,12 +94,14 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 
   stack.enter(getCanvasTransform());
 
+  // Draw canvas
   array[0] = Vertex{.position = stack.apply(tex_tl), .tex_coords = tex_tl};
   array[1] = Vertex{.position = stack.apply(tex_tr), .tex_coords = tex_tr};
   array[2] = Vertex{.position = stack.apply(tex_bl), .tex_coords = tex_bl};
   array[3] = Vertex{.position = stack.apply(tex_br), .tex_coords = tex_br};
   target.draw(array, m_canvas.getTexture());
 
+  // Draw tool widgets
   plug::Widget* tool_widget = m_palette.getActiveTool().getWidget();
   if (m_isFocused && tool_widget != nullptr)
   {
@@ -61,6 +111,7 @@ void CanvasView::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 
   stack.enter(Transform(getLayoutBox().getPosition()));
   m_titlebar.draw(stack, target);
+  m_closeButton.draw(stack, target);
   stack.leave();
 }
 
@@ -223,10 +274,31 @@ void CanvasView::onKeyboardReleased(const plug::KeyboardReleasedEvent& event,
   }
 }
 
+void CanvasView::onTick(const plug::TickEvent&, plug::EHC&)
+{
+  if (strcmp(m_titlebar.getName(), m_canvas.getName()) != 0)
+  {
+    m_titlebar.setName(m_canvas.getName());
+  }
+}
+
+static inline double getFitScale(const Vec2d& original, const Vec2d& target)
+{
+  const double scale_x = target.x / original.x;
+  const double scale_y = target.y / original.y;
+  return scale_x < scale_y ? scale_x : scale_y;
+}
+
 plug::Transform CanvasView::getCanvasTransform(void) const
 {
-  return plug::Transform(getLayoutBox().getPosition(),
-                         getLayoutBox().getSize() / m_canvas.getSize());
+  const double scale =
+      getFitScale(m_canvas.getSize(), m_canvasLayoutBox.getSize());
+  const Vec2d offset =
+      (m_canvasLayoutBox.getSize() - scale * m_canvas.getSize()) / 2;
+
+  return Transform(getLayoutBox().getPosition() +
+                       m_canvasLayoutBox.getPosition() + offset,
+                   Vec2d(scale, scale));
 }
 
 } // namespace gui

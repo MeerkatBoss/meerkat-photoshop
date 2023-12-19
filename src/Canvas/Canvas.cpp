@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <cstring>
 
 #include "Canvas/SelectionMask.h"
 #include "Impl/RenderTarget/SfmlRenderTarget/RenderTarget.h"
@@ -12,12 +13,16 @@ Logger Canvas::s_logger = Logger("Canvas");
 
 Canvas::Canvas(const char* name, size_t width, size_t height) :
     m_cacheState(Valid),
-    m_name(name),
+    m_name(new char[strlen(name) + 1]),
     m_width(width),
     m_height(height),
     m_mask(width, height),
     m_rawTexture(new plug::Texture(width, height))
 {
+  const size_t name_len = strlen(name);
+  strncpy(m_name, name, name_len);
+  m_name[name_len] = '\0';
+
   m_mask.fill(true);
   m_renderTexture.create(width, height);
   m_renderTexture.clear(sf::Color::White);
@@ -27,9 +32,19 @@ Canvas::Canvas(const char* name, size_t width, size_t height) :
 
 Canvas::~Canvas(void)
 {
-  delete m_rawTexture;
   s_logger.LOG_DEBUG(Content::TEXT, "Destroyed canvas '%s' %zux%zu at %p",
                      m_name, m_width, m_height, this);
+  delete[] m_name;
+  delete m_rawTexture;
+}
+
+void Canvas::setName(const char* new_name)
+{
+  const size_t name_len = strlen(new_name);
+  delete[] m_name;
+  m_name = new char[name_len + 1];
+  strncpy(m_name, new_name, name_len);
+  m_name[name_len] = '\0';
 }
 
 void Canvas::draw(const plug::VertexArray& vertex_array)

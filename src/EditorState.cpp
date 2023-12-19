@@ -191,7 +191,10 @@ void EditorState::openCanvas(const char* filename)
   sf::Image image;
 
   bool loaded = image.loadFromFile(filename);
-  assert(loaded);
+  if (!loaded)
+  {
+    return;
+  }
 
   size_t width  = image.getSize().x;
   size_t height = image.getSize().y;

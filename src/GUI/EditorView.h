@@ -18,6 +18,7 @@
 #include "GUI/CanvasView.h"
 #include "GUI/ColorSelector.h"
 #include "GUI/FilterSelector.h"
+#include "GUI/TextField.h"
 #include "GUI/ToolSelector.h"
 
 namespace gui
@@ -26,28 +27,7 @@ namespace gui
 class EditorView : public Widget
 {
 public:
-  EditorView(EditorState& editor_state, const plug::LayoutBox& layout_box) :
-      Widget(layout_box),
-      m_editorState(editor_state),
-      m_filterSelector(editor_state.getFilters(),
-          layout::LayoutBox(5_cm, 50_per, layout::Align::TopRight)),
-      m_toolSelector(editor_state.getTools(),
-          layout::LayoutBox(5_cm, 50_per, layout::Align::BottomRight)),
-      m_colorSelector(
-          editor_state.getColors(),
-          layout::LayoutBox(5_cm, 100_per, layout::Align::CenterLeft)),
-      m_views(),
-      m_activeView(nullptr)
-  {
-    m_colorSelector.addColor(plug::Color(0, 0, 0));
-    m_colorSelector.addColor(plug::Color(255, 0, 0));
-    m_colorSelector.addColor(plug::Color(0, 255, 0));
-    m_colorSelector.addColor(plug::Color(0, 0, 255));
-    m_colorSelector.addColor(plug::Color(255, 255, 0));
-    m_colorSelector.addColor(plug::Color(255, 0, 255));
-    m_colorSelector.addColor(plug::Color(0, 255, 255));
-    m_colorSelector.addColor(plug::Color(255, 255, 255));
-  }
+  EditorView(EditorState& editor_state, const plug::LayoutBox& layout_box);
 
   virtual ~EditorView(void) override
   {
@@ -55,6 +35,10 @@ public:
     for (size_t i = 0; i < view_count; ++i)
     {
       delete m_views[i];
+    }
+    if (m_textField != nullptr)
+    {
+      delete m_textField;
     }
   }
 
@@ -69,20 +53,30 @@ public:
   void onParentUpdate(const plug::LayoutBox& parent_box) override;
 
 protected:
-  /* TODO: Allow creating and opening canvases with hotkeys and menus */
+  virtual void onTick(const plug::TickEvent& event,
+                      plug::EHC&             context) override;
 
   virtual void onKeyboardPressed(const plug::KeyboardPressedEvent& event,
                                  plug::EHC& context) override;
 
 private:
+  void closePending(void);
+
   EditorState& m_editorState;
+
+  TextField*            m_textField;
 
   FilterSelector        m_filterSelector;
   ToolSelector          m_toolSelector;
   ColorSelector         m_colorSelector;
-  DynArray<CanvasView*> m_views;
+
   CanvasView*           m_activeView;
   size_t                m_activeViewIdx;
+
+  DynArray<CanvasView*> m_views;
+
+  CanvasView*           m_pendingClose;
+  bool                  m_hasPendingOpen;
 };
 
 } // namespace gui

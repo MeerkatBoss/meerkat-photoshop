@@ -75,7 +75,7 @@ public:
     return *m_rawTexture;
   }
 
-  void setName(const char* new_name) { m_name = new_name; }
+  void setName(const char* new_name);
 
   const char* getName(void) const { return m_name; }
 
@@ -94,7 +94,7 @@ private:
 
   mutable CacheState m_cacheState;
 
-  const char* m_name;
+  char* m_name;
   size_t m_width;
   size_t m_height;
 

@@ -13,7 +13,9 @@
 #define __GUI_TITLEBAR_H
 
 #include <SFML/Graphics/RenderTexture.hpp>
+
 #include "Common/GUI/Widget.h"
+#include "Sprite/CompositeSprite.h"
 
 namespace gui
 {
@@ -21,21 +23,27 @@ namespace gui
 class Titlebar : public Widget
 {
 public:
-  Titlebar(const char* name, const plug::LayoutBox& layout_box) :
-    Widget(layout_box),
-    m_name(name)
-  {
-    m_renderTexture.create(200, 1500);
-  }
+  Titlebar(const char* name, const plug::LayoutBox& layout_box);
+
+  virtual ~Titlebar(void) override { delete[] m_name; }
 
   virtual void draw(plug::TransformStack& stack,
                     plug::RenderTarget&   target) override;
 
-  void setName(const char* name) { m_name = name; }
+  void setName(const char* name);
+
+  const char* getName(void) const { return m_name; }
+
+  virtual void onParentUpdate(const plug::LayoutBox& parent_box) override
+  {
+    Widget::onParentUpdate(parent_box);
+    setName(m_name);
+  }
 
 private:
-  const char* m_name;
-  sf::RenderTexture m_renderTexture;
+  char* m_name;
+
+  CompositeSprite m_sprite;
 };
 
 } // namespace gui
