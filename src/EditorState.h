@@ -41,6 +41,8 @@ public:
 
   void loadPlugins(const char* plugdir);
 
+  void saveCanvas(const Canvas* canvas);
+
   void saveActiveCanvas(void)
   {
     if (m_activeCanvas != nullptr)
@@ -77,8 +79,6 @@ private:
   static Logger s_logger;
 
   plug::Plugin* getPluginFromDir(const char* dirpath);
-
-  void saveCanvas(const Canvas* canvas);
 
   Canvas*           m_activeCanvas;
   DynArray<Canvas*> m_canvases;

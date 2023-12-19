@@ -178,6 +178,8 @@ void EditorView::onTick(const plug::TickEvent&, plug::EHC&)
       {
         isActiveViewClosed = true;
       }
+      m_editorState.saveCanvas(&m_views[i]->getCanvas());
+
       delete m_views[i];
       m_views[i] = nullptr;
     }
