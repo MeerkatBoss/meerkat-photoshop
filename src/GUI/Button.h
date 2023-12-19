@@ -13,6 +13,7 @@
 #define __GUI_BUTTON_H
 
 #include "Common/GUI/Widget.h"
+#include "Sprite/Sprite.h"
 
 namespace gui
 {
@@ -34,14 +35,28 @@ public:
 class Button : public Widget
 {
 public:
-  Button(ButtonController& controller, const plug::LayoutBox& layout_box) :
+  Button(const Sprite& sprite, ButtonController& controller, const plug::LayoutBox& layout_box) :
       Widget(layout_box),
       m_buttonId(s_idCounter++),
       m_controller(controller),
+      m_sprite(sprite.clone()),
       m_pressed(false),
       m_hovered(false)
   {
   }
+
+  virtual ~Button(void) override
+  {
+    delete m_sprite;
+  }
+
+  void setSprite(const Sprite& sprite)
+  {
+    delete m_sprite;
+    m_sprite = sprite.clone();
+  }
+
+  const Sprite& getSprite(void) const { return *m_sprite; }
 
   virtual void draw(plug::TransformStack& transform_stack,
                     plug::RenderTarget&   target) override;
@@ -64,6 +79,8 @@ private:
 
   size_t            m_buttonId;
   ButtonController& m_controller;
+  Sprite*           m_sprite;
+
   bool              m_pressed;
   bool              m_hovered;
 };

@@ -24,8 +24,11 @@ void Button::onMousePressed(const plug::MousePressedEvent& event,
 
 void Button::onMouseReleased(const plug::MouseReleasedEvent& event, plug::EHC&)
 {
-  m_controller.onRelease(m_buttonId);
-  m_pressed = false;
+  if (event.button_id == plug::MouseButton::Left)
+  {
+    m_controller.onRelease(m_buttonId);
+    m_pressed = false;
+  }
 }
 
 void Button::onMouseMove(const plug::MouseMoveEvent& event, plug::EHC& context)
@@ -50,23 +53,9 @@ void Button::onTick(const plug::TickEvent& event, plug::EHC&)
   }
 }
 
-static plug::Vertex make_vertex(const plug::Vec2d& pos, plug::Color color)
-{
-  return {.position = pos, .tex_coords = plug::Vec2d(), .color = color};
-}
-
 void Button::draw(plug::TransformStack& stack, plug::RenderTarget& target)
 {
-  auto [tl, tr, bl, br] = getRect(getLayoutBox());
-  plug::Color gray(200, 200, 200);
-
-  plug::VertexArray vertices(plug::PrimitiveType::TriangleStrip, 4);
-  vertices[0] = make_vertex(stack.apply(tl), gray);
-  vertices[1] = make_vertex(stack.apply(tr), gray);
-  vertices[2] = make_vertex(stack.apply(bl), gray);
-  vertices[3] = make_vertex(stack.apply(br), gray);
-
-  target.draw(vertices);
+  m_sprite->draw(getLayoutBox(), stack, target);
 }
 
 } // namespace gui
